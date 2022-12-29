@@ -1001,8 +1001,8 @@ grid(Monitor *m)
 	ch = (m->wh) / rows;
 
 	for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++) {
-		cx = m->wx * (i % cols) * (cw);
-		cy = m->wy * (i / cols) * (ch);
+		cx = m->wx + (i % cols) * (cw);
+		cy = m->wy + (i / cols) * (ch);
 
 		resize(c, cx, cy, cw - 2 * c->bw, ch - 2 * c->bw, 0);
 
