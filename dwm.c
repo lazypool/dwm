@@ -182,6 +182,7 @@ static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
 static void grabbuttons(Client *c, int focused);
 static void grabkeys(void);
 static void grid(Monitor *m);
+static void magicgrid(Monitor *m);
 static void incnmaster(const Arg *arg);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
@@ -1048,6 +1049,36 @@ grid(Monitor *m)
 }
 
 void
+magicgrid(Monitor *m)
+{
+	unsigned int n;
+	unsigned int cw, ch;
+	Client *c;
+
+	for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+	if(n == 0) return;
+	if(n > 2) {
+		grid(m);
+		return;
+	}
+
+	if(n == 1) {
+		c = nexttiled(m->clients);
+		cw = (m->ww) * 0.6;
+		ch = (m->wh) * 0.6;
+		resize(c, m->mx + (m->mw - cw) / 2, m->my + (m->mh - ch) / 2, cw - 2 * c->bw, ch - 2 * c->bw, 0);
+	}
+
+	if(n == 2) {
+		c = nexttiled(m->clients);
+		cw = (m->ww) / 2;
+		ch = (m->wh) * 0.6;
+		resize(c, m->mx, m->my + (m->mh - ch) / 2, cw - 2 * c->bw, ch - 2 * c->bw, 0);
+		resize(nexttiled(c->next), m->mx + cw, m->my + (m->mh - ch) / 2, cw - 2 * c->bw, ch - 2 * c->bw, 0);
+	}
+}
+
+void
 incnmaster(const Arg *arg)
 {
 	selmon->nmaster = MAX(selmon->nmaster + arg->i, 0);
@@ -1383,8 +1414,8 @@ resizeclient(Client *c, int x, int y, int w, int h)
 	if (c->isfloating || c->mon->lt[c->mon->sellt]->arrange == NULL) {
 		gapincr = gapoffset = 0;
 	} else {
-		/* Remove border and gap if layout is monocle or only one client */
-		if (c->mon->lt[c->mon->sellt]->arrange == monocle || n == 1) {
+		/* Remove border and gap if layout is monocle */
+		if (c->mon->lt[c->mon->sellt]->arrange == monocle) {
 			gapoffset = 0;
 			gapincr = -2 * borderpx;
 			wc.border_width = 0;
