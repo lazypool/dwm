@@ -6,6 +6,7 @@ static const unsigned int gappx     = 6;        /* gaps between windows */
 static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
+static const int viewontag          = 1;	    /* Switch view on tag switch */
 static const double defaultopacity  = 1.00;		/* default is no opacity */
 static const int user_bh            = 2;	    /* 2 is the default spacing around the bar's font */
 static const int vertpad            = 10;       /* vertical padding of bar */
