@@ -10,7 +10,7 @@ static const double defaultopacity  = 1.00;		/* default is no opacity */
 static const int user_bh            = 20;       /* 2 is the default spacing around the bar's font */
 static const int vertpad            = 10;       /* vertical padding of bar */
 static const int sidepad            = 10;       /* horizontal padding of bar */
-static const char *fonts[]          = { "nerd-fonts-complete:size=48" };
+static const char *fonts[]          = { "Sauce Code Pro Nerd:size=48" };
 static const char dmenufont[]       = "nerd-fonts-complete:size=48";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
@@ -23,6 +23,7 @@ static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
 	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+	[SchemeHid]  = { col_cyan,  col_gray1, col_cyan  },
 };
 static const unsigned int alphas[][3]      = {
 	/*               fg      bg        border     */
@@ -87,8 +88,10 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
 	{ MODKEY|ShiftMask,             XK_o,	   spawn,          {.v = flameshot } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
-	{ MODKEY,                       XK_u,      focusstack,     {.i = +1 } },
-	{ MODKEY,                       XK_e,      focusstack,     {.i = -1 } },
+	{ MODKEY,                       XK_u,      focusstackvis,  {.i = +1 } },
+	{ MODKEY,                       XK_e,      focusstackvis,  {.i = -1 } },
+	{ MODKEY|ShiftMask,             XK_u,      focusstackhid,  {.i = +1 } },
+	{ MODKEY|ShiftMask,             XK_e,      focusstackhid,  {.i = -1 } },
 	{ MODKEY,                       XK_l,      incnmaster,     {.i = +1 } },
 	{ MODKEY,                       XK_y,      incnmaster,     {.i = -1 } },
 	{ MODKEY,                       XK_n,      setmfact,       {.f = -0.05} },
@@ -110,6 +113,9 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_period, tagmon,         {.i = +1 } },
 	{ MODKEY|ShiftMask,				XK_equal,  changeopacity,  {.f = +0.1}},
 	{ MODKEY|ShiftMask,				XK_minus,  changeopacity,  {.f = -0.1}},
+	{ MODKEY,                       XK_s,      show,           {0} },
+	{ MODKEY|ShiftMask,             XK_s,      showall,        {0} },
+	{ MODKEY,                       XK_h,      hide,           {0} },
 	TAGKEYS(                        XK_1,                      0)
 	TAGKEYS(                        XK_2,                      1)
 	TAGKEYS(                        XK_3,                      2)
@@ -128,6 +134,7 @@ static const Button buttons[] = {
 	/* click                event mask      button          function        argument */
 	{ ClkLtSymbol,          0,              Button1,        setlayout,      {0} },
 	{ ClkLtSymbol,          0,              Button3,        setlayout,      {.v = &layouts[2]} },
+	{ ClkWinTitle,          0,              Button1,        togglewin,      {0} },
 	{ ClkWinTitle,          0,              Button2,        zoom,           {0} },
 	{ ClkStatusText,        0,              Button2,        spawn,          {.v = termcmd } },
 	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
