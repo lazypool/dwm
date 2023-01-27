@@ -7,11 +7,11 @@ static const unsigned int snap      = 32;       /* snap pixel */
 static const int showbar            = 1;        /* 0 means no bar */
 static const int topbar             = 1;        /* 0 means bottom bar */
 static const double defaultopacity  = 1.00;		/* default is no opacity */
-static const int user_bh            = 20;       /* 2 is the default spacing around the bar's font */
+static const int user_bh            = 2;	    /* 2 is the default spacing around the bar's font */
 static const int vertpad            = 10;       /* vertical padding of bar */
 static const int sidepad            = 10;       /* horizontal padding of bar */
-static const char *fonts[]          = { "Sauce Code Pro Nerd:size=48" };
-static const char dmenufont[]       = "nerd-fonts-complete:size=48";
+static const char *fonts[]          = { "Sauce Code Pro Nerd Font Mono:size=16" };
+static const char dmenufont[]       = "Sauce Code Pro Nerd Font Mono:size=16";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
