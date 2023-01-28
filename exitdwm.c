@@ -44,8 +44,10 @@ void exitdwm ()
 			S_FORMAT (OFFSCREEN) "\n"
 			S_FORMAT (EXIT) "\n"
 			S_FORMAT (REBOOT) "\n"
-			S_FORMAT (SHUTDOWN)
-			"\" | dmenu -p exit: -fn 'Sauce Code Pro Nerd Font Mono:size=16' -l 6 | " S_FORMAT_CLEAR
+			S_FORMAT (SHUTDOWN) "\" | "
+			"dmenu -p exit: -fn 'Sauce Code Pro Nerd Font Mono:size=16' -l 6 "
+			"-x 200 -y 200 -z 600"
+			" | " S_FORMAT_CLEAR
 		,
 		"r"
 	);
