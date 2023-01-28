@@ -30,7 +30,7 @@ void exitdwm ()
 # define S_LOCK_ICON "\uf023"			// <= FontAwesome icons
 # define S_RESTART_DWM_ICON "\uf01e"
 # define S_OFFSCREEN_ICON "\uf108"
-# define S_EXIT_ICON "\uf2f5"
+# define S_EXIT_ICON "\uf112"
 # define S_REBOOT_ICON "\uf021"
 # define S_SHUTDOWN_ICON "\uf011"
 
@@ -45,7 +45,7 @@ void exitdwm ()
 			S_FORMAT (EXIT) "\n"
 			S_FORMAT (REBOOT) "\n"
 			S_FORMAT (SHUTDOWN)
-			"\" | dmenu -p exit: -fn 'Sauce Code Pro Nerd Font Mono:size=16' | " S_FORMAT_CLEAR
+			"\" | dmenu -p exit: -fn 'Sauce Code Pro Nerd Font Mono:size=16' -l 6 | " S_FORMAT_CLEAR
 		,
 		"r"
 	);
