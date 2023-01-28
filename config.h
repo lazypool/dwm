@@ -84,6 +84,7 @@ static const char *flameshot[] = { "flameshot", "gui", NULL };
 static const char *reducevolume[] = { "reducevolume", NULL };
 static const char *increasevolume[] = { "increasevolume", NULL };
 
+#include "exitdwm.c"
 static const Key keys[] = {
 	/* modifier                     key						function        argument */
 	{ MODKEY,                       XK_p,      				spawn,          {.v = dmenucmd } },
@@ -130,6 +131,7 @@ static const Key keys[] = {
 	TAGKEYS(                        XK_8,      				                7)
 	TAGKEYS(                        XK_9,      				                8)
 	{ MODKEY|ShiftMask,             XK_q,      				quit,           {0} },
+	{ MODKEY|ShiftMask,             XK_e,					exitdwm,		{0} },
 };
 
 /* button definitions */
