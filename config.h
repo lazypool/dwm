@@ -33,7 +33,7 @@ static const unsigned int alphas[][3]      = {
 };
 
 /* tagging */
-static const char *tags[] = { "", "", "", "", "", "", "", "", "" };
+static const char *tags[] = { "", "", "", "", "", "" };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -42,14 +42,13 @@ static const Rule rules[] = {
 	 */
 	/* class			instance		title			tags mask     isfloating	opacity		monitor */
 	{ "Gimp",     		NULL,			NULL,       	0,            0,			1.00,		-1 },
-	{ "st-256color",	NULL,       	NULL,       	0,            0,			0.75,		-1 },
+	{ "st",				NULL,       	NULL,       	0,            0,			0.75,		-1 },
 	{ "wemeetapp",		NULL,       	NULL,       	0,            1,			1.00,		-1 },
 	{ "firefox",  		NULL,       	NULL,       	1 << 1,       0,			1.00,		-1 },
 	{ "icalingua",		NULL,       	NULL,       	1 << 2,       0,			0.85,		-1 },
+	{ "wechat",			NULL,       	NULL,       	1 << 3,       0,			0.85,		-1 },
 	{ "Steam",			NULL,       	NULL,       	1 << 4,       0,			0.85,		-1 },
-	{ "OxygenNotI",		NULL,       	NULL,       	1 << 5,       0,			1.00,		-1 },
-	{ "hmcl",			NULL,       	NULL,       	1 << 6,       0,			1.00,		-1 },
-	{ "Minecraft",		NULL,       	NULL,       	1 << 6,       0,			1.00,		-1 },
+	{ "hmcl",			NULL,       	NULL,       	1 << 5,       0,			1.00,		-1 },
 };
 
 /* layout(s) */
