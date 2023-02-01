@@ -34,7 +34,13 @@ static const unsigned int alphas[][3]      = {
 };
 
 /* tagging */
-static const char *tags[] = { "  ", "  ", "  ", "  ", "  ", "  " };
+static const char *tags[] = { "  ", "  ", "  ", "  ", "  ", "  " };
+
+/* overview */
+static const int overviewgappi = 24;
+static const int overviewgappo = 60;
+static const char *overviewtag = "OVERVIEW";
+static const Layout overviewlayout = { "  ", overview };
 
 static const Rule rules[] = {
 	/* xprop(1):
@@ -97,6 +103,7 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_o,	   				spawn,          {.v = flameshot } },
 	{ MODKEY|ShiftMask,             XK_bracketleft,			spawn,          {.v = reducevolume } },
 	{ MODKEY|ShiftMask,             XK_bracketright,		spawn,          {.v = increasevolume } },
+	{ MODKEY,                       XK_a,      				toggleoverview, {0} },
 	{ MODKEY,                       XK_b,					togglebar,      {0} },
 	{ MODKEY,                       XK_u,      				focusstackvis,  {.i = +1 } },
 	{ MODKEY,                       XK_e,      				focusstackvis,  {.i = -1 } },

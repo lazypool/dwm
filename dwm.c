@@ -50,7 +50,7 @@
 #define CLEANMASK(mask)         (mask & ~(numlockmask|LockMask) & (ShiftMask|ControlMask|Mod1Mask|Mod2Mask|Mod3Mask|Mod4Mask|Mod5Mask))
 #define INTERSECT(x,y,w,h,m)    (MAX(0, MIN((x)+(w),(m)->wx+(m)->ww) - MAX((x),(m)->wx)) \
                                * MAX(0, MIN((y)+(h),(m)->wy+(m)->wh) - MAX((y),(m)->wy)))
-#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]))
+#define ISVISIBLE(C)            ((C->mon->isoverview || C->tags & C->mon->tagset[C->mon->seltags]))
 #define HIDDEN(C)               ((getstate(C->win) == IconicState))
 #define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MOUSEMASK               (BUTTONMASK|PointerMotionMask)
@@ -140,6 +140,7 @@ struct Monitor {
 	Window barwin;
 	const Layout *lt[2];
 	Pertag *pertag;
+	unsigned int isoverview;
 };
 
 typedef struct {
@@ -183,6 +184,7 @@ static void focusmon(const Arg *arg);
 static void focusstackvis(const Arg *arg);
 static void focusstackhid(const Arg *arg);
 static void focusstack(int inc, int vis);
+static void pointerfocuswin(Client *c);
 static Atom getatomprop(Client *c, Atom prop);
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
@@ -191,8 +193,9 @@ static void grabbuttons(Client *c, int focused);
 static void grabkeys(void);
 static void hide(const Arg *arg);
 static void hidewin(Client *c);
-static void grid(Monitor *m);
+static void grid(Monitor *m, uint gappo, uint gappi);
 static void magicgrid(Monitor *m);
+static void overview(Monitor *m);
 static void incnmaster(const Arg *arg);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
@@ -237,6 +240,7 @@ static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void toggletag(const Arg *arg);
 static void toggleview(const Arg *arg);
+static void toggleoverview(const Arg *arg);
 static void togglewin(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
 static void unmanage(Client *c, int destroyed);
@@ -443,9 +447,14 @@ arrange(Monitor *m)
 void
 arrangemon(Monitor *m)
 {
-	strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol);
-	if (m->lt[m->sellt]->arrange)
-		m->lt[m->sellt]->arrange(m);
+	if (m->isoverview) {
+		strncpy(m->ltsymbol, overviewlayout.symbol, sizeof m->ltsymbol);
+		overviewlayout.arrange(m);
+	} else {
+		strncpy(m->ltsymbol, m->lt[m->sellt]->symbol, sizeof m->ltsymbol);
+		if (m->lt[m->sellt]->arrange)
+			m->lt[m->sellt]->arrange(m);
+	}
 }
 
 void
@@ -742,6 +751,7 @@ createmon(void)
 
 		m->pertag->showbars[i] = m->showbar;
 	}
+	m->isoverview = 0;
 
 	return m;
 }
@@ -823,16 +833,24 @@ drawbar(Monitor *m)
 			urg |= c->tags;
 	}
 	x = 0;
-	for (i = 0; i < LENGTH(tags); i++) {
-		w = TEXTW(tags[i]);
-		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
-		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
-		if (occ & 1 << i)
-			drw_rect(drw, x + boxx, boxy, boxw, boxh,
-				m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
-				urg & 1 << i);
+	if (m->isoverview) {
+		w = TEXTW(overviewtag);
+		drw_setscheme(drw, scheme[SchemeSel]);
+		drw_text(drw, x, 0, w, bh, lrpad / 2, overviewtag, 0);
+		drw_setscheme(drw, scheme[SchemeNorm]);
 		x += w;
-	}
+	} else {
+		for (i = 0; i < LENGTH(tags); i++) {
+			w = TEXTW(tags[i]);
+			drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
+			drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+			if (occ & 1 << i)
+				drw_rect(drw, x + boxx, boxy, boxw, boxh,
+					m == selmon && selmon->sel && selmon->sel->tags & 1 << i,
+					urg & 1 << i);
+			x += w;
+		}
+	} 
 	w = TEXTW(m->ltsymbol);
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
@@ -1016,6 +1034,17 @@ focusstack(int inc, int hid)
 	}
 }
 
+void
+pointerfocuswin(Client *c)
+{
+	if (c) {
+		XWarpPointer(dpy, None, root, 0, 0, 0, 0, c->x + c->w / 2, c->y + c->h / 2);
+		focus(c);
+	} else 
+		XWarpPointer(dpy, None, root, 0, 0, 0, 0, selmon->wx + selmon->ww / 3, selmon->wy + selmon->wh / 2);
+
+}
+
 Atom
 getatomprop(Client *c, Atom prop)
 {
@@ -1133,63 +1162,89 @@ grabkeys(void)
 }
 
 void
-grid(Monitor *m)
+magicgrid(Monitor *m)
 {
-	unsigned int i, n;
-	unsigned int cx, cy, cw, ch;
-	unsigned int cols, rows;
-	Client *c;
-
-	for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
-	if (n == 0) return;
-	if (n == 2) rows = 1, cols = 2;
-	else {
-		for (cols = 0; cols <= n / 2; cols++)
-			if (cols * cols >= n)
-				break;
-		rows = (cols && (cols - 1) * cols >= n) ? cols - 1 : cols;
-	}
-
-	cw = (m->ww) / cols;
-	ch = (m->wh) / rows;
-
-	for(i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++) {
-		cx = m->wx + (i % cols) * (cw);
-		cy = m->wy + (i / cols) * (ch);
-
-		resize(c, cx, cy, cw - 2 * c->bw, ch - 2 * c->bw, 0);
-
-		i++;
-	}
+	grid(m, 12, 12);
 }
 
 void
-magicgrid(Monitor *m)
+overview(Monitor *m)
 {
-	unsigned int n;
-	unsigned int cw, ch;
-	Client *c;
+	grid(m, overviewgappo, overviewgappi);
+}
 
-	for(n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
-	if(n == 0) return;
-	if(n > 2) {
-		grid(m);
-		return;
-	}
+void
+toggleoverview(const Arg *arg)
+{
+	uint target = selmon->sel ? selmon->sel->tags : selmon->seltags;
+	selmon->isoverview ^= 1;
+	view(&(Arg){ .ui = target });
+	pointerfocuswin(selmon->sel);
+}
 
-	if(n == 1) {
-		c = nexttiled(m->clients);
-		cw = (m->ww) * 0.6;
-		ch = (m->wh) * 0.6;
-		resize(c, m->mx + (m->mw - cw) / 2, m->my + (m->mh - ch) / 2, cw - 2 * c->bw, ch - 2 * c->bw, 0);
-	}
+void
+grid(Monitor *m, uint gappo, uint gappi)
+{
+    unsigned int i, n;
+    unsigned int cx, cy, cw, ch;
+    unsigned int dx;
+    unsigned int cols, rows, overcols;
+    Client *c;
 
-	if(n == 2) {
-		c = nexttiled(m->clients);
-		cw = (m->ww) / 2;
-		ch = (m->wh) * 0.6;
-		resize(c, m->mx, m->my + (m->mh - ch) / 2, cw - 2 * c->bw, ch - 2 * c->bw, 0);
-		resize(nexttiled(c->next), m->mx + cw, m->my + (m->mh - ch) / 2, cw - 2 * c->bw, ch - 2 * c->bw, 0);
+    for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
+    if (n == 0) return;
+    if (n == 1) {
+        c = nexttiled(m->clients);
+        cw = (m->ww - 2 * gappo) * 0.7;
+        ch = (m->wh - 2 * gappo) * 0.65;
+        resize(c,
+               m->mx + (m->mw - cw) / 2 + gappo,
+               m->my + (m->mh - ch) / 2 + gappo,
+               cw - 2 * c->bw,
+               ch - 2 * c->bw,
+               0);
+        return;
+    }
+    if (n == 2) {
+        c = nexttiled(m->clients);
+        cw = (m->ww - 2 * gappo - gappi) / 2;
+        ch = (m->wh - 2 * gappo) * 0.65;
+        resize(c,
+               m->mx + gappo,
+               m->my + (m->mh - ch) / 2 + gappo,
+               cw - 2 * c->bw,
+               ch - 2 * c->bw,
+               0);
+        resize(nexttiled(c->next),
+               m->mx + cw + gappo + gappi,
+               m->my + (m->mh - ch) / 2 + gappo,
+               cw - 2 * c->bw,
+               ch - 2 * c->bw,
+               0);
+        return;
+    }
+
+    for (cols = 0; cols <= n / 2; cols++)
+        if (cols * cols >= n)
+            break;
+    rows = (cols && (cols - 1) * cols >= n) ? cols - 1 : cols;
+	ch = (m->wh - 2 * gappo - (rows - 1) * gappi) / rows;
+	cw = (m->ww - 2 * gappo - (cols - 1) * gappi) / cols;
+
+    overcols = n % cols;
+    if (overcols) dx = (m->ww - overcols * cw - (overcols - 1) * gappi) / 2 - gappo;
+	for (i = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++) {
+        cx = m->wx + (i % cols) * (cw + gappi);
+        cy = m->wy + (i / cols) * (ch + gappi);
+        if (overcols && i >= n - overcols) {
+            cx += dx;
+        }
+        resize(c,
+               cx + gappo,
+               cy + gappo,
+               cw - 2 * c->bw,
+               ch - 2 * c->bw,
+               0);
 	}
 }
 
@@ -2502,8 +2557,6 @@ view(const Arg *arg)
 	int i;
 	unsigned int tmptag;
 
-	if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
-		return;
 	selmon->seltags ^= 1; /* toggle sel tagset */
 	if (arg->ui & TAGMASK) {
 		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
