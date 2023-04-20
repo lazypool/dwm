@@ -95,6 +95,17 @@ static const char *flameshot[] = { "flameshot", "gui", NULL };
 static const char *reducevolume[] = { "reducevolume", NULL };
 static const char *increasevolume[] = { "increasevolume", NULL };
 
+static const char xkb_layout[] = "us";
+static const char xkb_variant[] = "colemak";
+static const char *setcolemak[] = { 
+	"setxkbmap", "-layout", xkb_layout, "-variant", xkb_variant, 
+	"-option", "caps:swapescape", "-option", "lv3:ralt_alt", NULL 
+};
+static const char *setqwerty[] = { 
+	"setxkbmap", "-layout", xkb_layout, 
+	"-option", "caps:swapescape", "-option", "lv3:ralt_alt", NULL 
+};
+
 #include "exitdwm.c"
 static const Key keys[] = {
 	/* modifier                     key						function        argument */
@@ -103,6 +114,8 @@ static const Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_o,	   				spawn,          {.v = flameshot } },
 	{ MODKEY|ShiftMask,             XK_bracketleft,			spawn,          {.v = reducevolume } },
 	{ MODKEY|ShiftMask,             XK_bracketright,		spawn,          {.v = increasevolume } },
+	{ MODKEY|ShiftMask,             XK_F5,					spawn,		    {.v = setcolemak } },
+	{ MODKEY|ShiftMask,             XK_F6,					spawn,		    {.v = setqwerty } },
 	{ MODKEY,                       XK_a,      				toggleoverview, {0} },
 	{ MODKEY,                       XK_b,					togglebar,      {0} },
 	{ MODKEY,                       XK_u,      				focusstackvis,  {.i = +1 } },
