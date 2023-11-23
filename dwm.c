@@ -1527,9 +1527,11 @@ void
 pop(Client *c)
 {
 	detach(c);
-	attach(c);
+	c->next = c->mon->clients;
+	c->mon->clients = c;
 	focus(c);
 	arrange(c->mon);
+	pointerfocuswin(c);
 }
 
 void
