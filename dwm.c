@@ -84,6 +84,7 @@ typedef struct {
 
 typedef struct Monitor Monitor;
 typedef struct Client Client;
+typedef struct Pertag Pertag;
 struct Client {
 	char name[256];
 	float mina, maxa;
@@ -130,6 +131,7 @@ struct Monitor {
 	Monitor *next;
 	Window barwin;
 	const Layout *lt[2];
+	Pertag *pertag;
 };
 
 typedef struct {
@@ -185,6 +187,7 @@ static void monocle(Monitor *m);
 static void motionnotify(XEvent *e);
 static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
+static void pertagupdate(Monitor *m);
 static void pop(Client *c);
 static void propertynotify(XEvent *e);
 static void quit(const Arg *arg);
@@ -270,6 +273,13 @@ static Window root, wmcheckwin;
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
+
+struct Pertag {
+	unsigned int curtag; /* current and previous tag */
+	int nmasters[LENGTH(tags)]; /* number of windows in master area */
+	unsigned int sellts[LENGTH(tags)]; /* selected layouts */
+	const Layout *ltidxs[LENGTH(tags)][2]; /* matrix of tags and layouts indexes  */
+};
 
 /* compile-time check if all tags fit into an unsigned int bit array. */
 struct NumTags { char limitexceeded[LENGTH(tags) > 31 ? -1 : 1]; };
@@ -634,6 +644,7 @@ Monitor *
 createmon(void)
 {
 	Monitor *m;
+	unsigned int i;
 
 	m = ecalloc(1, sizeof(Monitor));
 	m->tagset[0] = m->tagset[1] = 1;
@@ -644,6 +655,14 @@ createmon(void)
 	m->lt[0] = &layouts[0];
 	m->lt[1] = &layouts[1 % LENGTH(layouts)];
 	strncpy(m->ltsymbol, layouts[0].symbol, sizeof m->ltsymbol);
+	m->pertag = ecalloc(1, sizeof(Pertag));
+	m->pertag->curtag = 0;
+	for (i = 0; i < LENGTH(tags); i++) {
+		m->pertag->nmasters[i] = m->nmaster;
+		m->pertag->ltidxs[i][0] = m->lt[0];
+		m->pertag->ltidxs[i][1] = m->lt[1];
+		m->pertag->sellts[i] = m->sellt;
+	}
 	return m;
 }
 
@@ -980,7 +999,7 @@ grabkeys(void)
 void
 incnmaster(const Arg *arg)
 {
-	selmon->nmaster = MAX(selmon->nmaster + arg->i, 0);
+	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag] = MAX(selmon->nmaster + arg->i, 0);
 	arrange(selmon);
 }
 
@@ -1207,6 +1226,15 @@ nexttiled(Client *c)
 {
 	for (; c && (c->isfloating || !ISVISIBLE(c)); c = c->next);
 	return c;
+}
+
+void
+pertagupdate(Monitor *m)
+{
+	m->nmaster = m->pertag->nmasters[m->pertag->curtag];
+	m->sellt = m->pertag->sellts[m->pertag->curtag];
+	m->lt[m->sellt] = m->pertag->ltidxs[m->pertag->curtag][m->sellt];
+	m->lt[m->sellt^1] = m->pertag->ltidxs[m->pertag->curtag][m->sellt^1];
 }
 
 void
@@ -1511,9 +1539,9 @@ void
 setlayout(const Arg *arg)
 {
 	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt])
-		selmon->sellt ^= 1;
+		selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag] ^= 1;
 	if (arg && arg->v)
-		selmon->lt[selmon->sellt] = (Layout *)arg->v;
+		selmon->lt[selmon->sellt] = selmon->pertag->ltidxs[selmon->pertag->curtag][selmon->sellt] = (Layout *)arg->v;
 	strncpy(selmon->ltsymbol, selmon->lt[selmon->sellt]->symbol, sizeof selmon->ltsymbol);
 	if (selmon->sel)
 		arrange(selmon);
@@ -1754,9 +1782,14 @@ void
 toggleview(const Arg *arg)
 {
 	unsigned int newtagset = selmon->tagset[selmon->seltags] ^ (arg->ui & TAGMASK);
-
+	int i;
 	if (newtagset) {
 		selmon->tagset[selmon->seltags] = newtagset;
+		if (!(newtagset & 1 << (selmon->pertag->curtag))) {
+			for (i = 0; !(newtagset & 1 << i); i++);
+			selmon->pertag->curtag = i;
+		}
+		pertagupdate(selmon);
 		focus(NULL);
 		arrange(selmon);
 	}
@@ -2053,13 +2086,19 @@ updatewmhints(Client *c)
 void
 view(const Arg *arg)
 {
-	if ((arg->ui & TAGMASK) == selmon->tagset[selmon->seltags])
-		return;
-	selmon->seltags ^= 1; /* toggle sel tagset */
-	if (arg->ui & TAGMASK)
-		selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
-	focus(NULL);
-	arrange(selmon);
+	unsigned int notsame = (arg->ui & TAGMASK) ^ selmon->tagset[selmon->seltags];
+	int i;
+	if (notsame) {
+		selmon->seltags ^= 1;
+		if (arg->ui & TAGMASK) {
+			selmon->tagset[selmon->seltags] = arg->ui & TAGMASK;
+			for (i = 0; !(arg->ui & 1 << i); i++);
+			selmon->pertag->curtag = i;
+		}
+		pertagupdate(selmon);
+		focus(NULL);
+		arrange(selmon);
+	}
 }
 
 Client *
