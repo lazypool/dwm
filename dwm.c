@@ -999,7 +999,11 @@ grabkeys(void)
 void
 incnmaster(const Arg *arg)
 {
-	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag] = MAX(selmon->nmaster + arg->i, 0);
+	int n, a;
+	Client *c;
+	for (n = 0, c = nexttiled(selmon->clients); c; c = nexttiled(c->next), n++);
+	a = n ? ((selmon->nmaster + arg->i) % n + n) % n : 1;
+	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag] = a ? a : n;
 	arrange(selmon);
 }
 
@@ -1785,6 +1789,7 @@ toggleview(const Arg *arg)
 	int i;
 	if (newtagset) {
 		selmon->tagset[selmon->seltags] = newtagset;
+		incnmaster(&(Arg){.i = 0});
 		if (!(newtagset & 1 << (selmon->pertag->curtag))) {
 			for (i = 0; !(newtagset & 1 << i); i++);
 			selmon->pertag->curtag = i;
@@ -2096,6 +2101,7 @@ view(const Arg *arg)
 			selmon->pertag->curtag = i;
 		}
 		pertagupdate(selmon);
+		incnmaster(&(Arg){.i = 0});
 		focus(NULL);
 		arrange(selmon);
 	}
