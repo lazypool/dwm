@@ -1719,28 +1719,55 @@ tagmon(const Arg *arg)
 void
 tile(Monitor *m)
 {
-	unsigned int i, n, h, mw, my, ty;
+	unsigned int i, n, mw, my, ty, ns;
+	unsigned int cx, cy, cw, ch, gappx;
 	Client *c;
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
 	if (n == 0)
 		return;
 
-	if (n > m->nmaster)
-		mw = m->nmaster ? m->ww * m->mfact : 0;
-	else
-		mw = m->ww;
-	for (i = my = ty = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
+	if (n == 1) {
+		c = nexttiled(m->clients);
+		cx = m->wx + m->ww*0.075;
+		cy = m->wy + m->wh*0.075;
+		cw = m->ww*0.85;
+		ch = m->wh*0.85;
+		resize(c, cx, cy, cw - (2*c->bw), ch - (2*c->bw), 0);
+		return;
+	}
+
+	if (n == 2) {
+		c = nexttiled(m->clients);
+		cx = m->wx + m->ww*0.025;
+		cy = m->wy + m->wh*0.025;
+		cw = m->ww*0.47;
+		ch = m->wh*0.95;
+		resize(c, cx, cy, cw - (2*c->bw), ch - (2*c->bw), 0);
+		resize(nexttiled(c->next), m->ww - cx - cw, cy, cw - (2*c->bw), ch - (2*c->bw), 0);
+		return;
+	}
+
+	mw = n > m->nmaster ? m->ww * m->mfact : m->ww;
+	ns = n > m->nmaster ? 2 : 1;
+	gappx = m->ww*0.005;
+	for (i = 0, my = ty = gappx, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
 		if (i < m->nmaster) {
-			h = (m->wh - my) / (MIN(n, m->nmaster) - i);
-			resize(c, m->wx, m->wy + my, mw - (2*c->bw), h - (2*c->bw), 0);
+			cx = m->wx + gappx;
+			cy = m->wy + my;
+			cw = mw - gappx*(5-ns)/2;
+			ch = (m->wh - my) / (m->nmaster - i) - gappx;
+			resize(c, cx, cy, cw - (2*c->bw), ch - (2*c->bw), 0);
 			if (my + HEIGHT(c) < m->wh)
-				my += HEIGHT(c);
+				my += HEIGHT(c) + gappx;
 		} else {
-			h = (m->wh - ty) / (n - i);
-			resize(c, m->wx + mw, m->wy + ty, m->ww - mw - (2*c->bw), h - (2*c->bw), 0);
+			cx = m->wx + mw + gappx/ns;
+			cy = m->wy + ty;
+			cw = m->ww - mw - gappx*(5-ns)/2;
+			ch = (m->wh - ty) / (n - i) - gappx;
+			resize(c, cx, cy, cw - (2*c->bw), ch - (2*c->bw), 0);
 			if (ty + HEIGHT(c) < m->wh)
-				ty += HEIGHT(c);
+				ty += HEIGHT(c) + gappx;
 		}
 }
 
