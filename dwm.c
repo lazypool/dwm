@@ -218,6 +218,7 @@ static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void toggleglobal(const Arg *arg);
 static void toggleview(const Arg *arg);
+static void transfer(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
 static void unmanage(Client *c, int destroyed);
 static void unmapnotify(XEvent *e);
@@ -1009,7 +1010,6 @@ incnmaster(const Arg *arg)
 	for (n = 0, c = nexttiled(selmon->clients); c; c = nexttiled(c->next), n++);
 	a = n ? ((selmon->nmaster + arg->i) % n + n) % n : 1;
 	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag] = a ? a : n;
-	arrange(selmon);
 }
 
 #ifdef XINERAMA
@@ -1833,6 +1833,32 @@ toggleview(const Arg *arg)
 		focus(NULL);
 		arrange(selmon);
 	}
+}
+
+void
+transfer(const Arg *arg)
+{
+	Client *c, *mtail, *stail, *insertafter;
+	int i, tostack;
+
+	for (i = 0, c = nexttiled(selmon->clients); c; i++, c = nexttiled(c->next)) {
+		if (c == selmon->sel) tostack = i < selmon->nmaster;
+		if (i < selmon->nmaster) mtail = c;
+		stail = c;
+	}
+
+	if (i == 0 || !selmon->sel || selmon->sel->isfloating)
+		return;
+
+	insertafter = tostack ? stail : mtail;
+	incnmaster(&(Arg){.i = tostack ? -1 : +1});
+
+	if (insertafter != selmon->sel) {
+		detach(selmon->sel);
+		selmon->sel->next = insertafter->next;
+		insertafter->next = selmon->sel;
+	}
+	arrange(selmon);
 }
 
 void
