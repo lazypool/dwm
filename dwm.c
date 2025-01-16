@@ -528,8 +528,10 @@ cleanupmon(Monitor *mon)
 		for (m = mons; m && m->next != mon; m = m->next);
 		m->next = mon->next;
 	}
-	XUnmapWindow(dpy, mon->barwins[0]);
-	XDestroyWindow(dpy, mon->barwins[0]);
+	for (int i = 0; i < 3; i ++) {
+		XUnmapWindow(dpy, mon->barwins[i]);
+		XDestroyWindow(dpy, mon->barwins[i]);
+	}
 	free(mon);
 }
 
@@ -728,13 +730,13 @@ dirtomon(int dir)
 void
 drawbar(Monitor *m)
 {
-	int x, w, tw = 0;
+	int x, w, tw = 0, s = 0;
 	int boxs = drw->fonts->h / 9;
 	int boxw = drw->fonts->h / 6 + 2;
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
 
-	if (!m->showbar)
+	if (!m->barwins[0] || !m->barwins[1] || !m->barwins[2] || !m->showbar)
 		return;
 
 	/* draw status first so it can be overdrawn by tags later */
@@ -742,6 +744,8 @@ drawbar(Monitor *m)
 		drw_setscheme(drw, scheme[SchemeNorm]);
 		tw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
 		drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0);
+		XMoveResizeWindow(dpy, m->barwins[2], m->wx + m->ww - tw, m->by, tw, bh);
+		drw_map(drw, m->barwins[2], m->ww - tw, 0, m->ww, bh);
 	}
 
 	for (c = m->clients; c; c = c->next) {
@@ -762,19 +766,20 @@ drawbar(Monitor *m)
 	w = TEXTW(m->ltsymbol);
 	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
+	XMoveResizeWindow(dpy, m->barwins[0], m->wx, m->by, x, bh);
+	drw_map(drw, m->barwins[0], 0, 0, x, bh);
 
-	if ((w = m->ww - tw - x) > bh) {
+	s = TEXTW(m->sel->name);
+	if ((w = m->ww - tw - x - s) > bh) {
 		if (m->sel) {
-			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
+			drw_setscheme(drw, scheme[SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
 			if (m->sel->isfloating)
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
-		} else {
-			drw_setscheme(drw, scheme[SchemeNorm]);
-			drw_rect(drw, x, 0, w, bh, 1, 1);
+			XMoveResizeWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - s) / 2, m->by, s, bh);
+			drw_map(drw, m->barwins[1], x, 0, w, bh);
 		}
 	}
-	drw_map(drw, m->barwins[0], 0, 0, m->ww, bh);
 }
 
 void
@@ -1929,14 +1934,16 @@ updatebars(void)
 	};
 	XClassHint ch = {"dwm", "dwm"};
 	for (m = mons; m; m = m->next) {
-		if (m->barwins[0])
-			continue;
-		m->barwins[0] = XCreateWindow(dpy, root, m->wx, m->by, m->ww, bh, 0, DefaultDepth(dpy, screen),
-				CopyFromParent, DefaultVisual(dpy, screen),
-				CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
-		XDefineCursor(dpy, m->barwins[0], cursor[CurNormal]->cursor);
-		XMapRaised(dpy, m->barwins[0]);
-		XSetClassHint(dpy, m->barwins[0], &ch);
+		for (int i = 0; i < 3; i ++) {
+			if (m->barwins[i])
+				continue;
+			m->barwins[i] = XCreateWindow(dpy, root, m->wx + m->ww, m->wy + m->wh, bh, bh, 0, DefaultDepth(dpy, screen),
+					CopyFromParent, DefaultVisual(dpy, screen),
+					CWOverrideRedirect|CWBackPixmap|CWEventMask, &wa);
+			XDefineCursor(dpy, m->barwins[i], cursor[CurNormal]->cursor);
+			XMapRaised(dpy, m->barwins[i]);
+			XSetClassHint(dpy, m->barwins[i], &ch);
+		}
 	}
 }
 
