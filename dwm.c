@@ -778,6 +778,8 @@ drawbar(Monitor *m)
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
 			XMoveResizeWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - s) / 2, m->by, s, bh);
 			drw_map(drw, m->barwins[1], x, 0, w, bh);
+		} else {
+			XMoveWindow(dpy, m->barwins[1], m->wx + m->ww / 2, -2 * bh);
 		}
 	}
 }
