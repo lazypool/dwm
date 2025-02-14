@@ -1943,14 +1943,17 @@ updatebars(void)
 void
 updatebarpos(Monitor *m)
 {
-	m->wy = m->my;
-	m->wh = m->mh;
+	/* padding x,y,w,h of MainWindow */
+	m->wx = m->mx + sidepad;
+	m->wy = m->my + sidepad;
+	m->ww = m->mw - 2 * sidepad;
+	m->wh = m->mh - 2 * sidepad;
 	if (m->showbar) {
-		m->wh -= bh;
+		m->wh -= bh + sidepad;
 		m->by = m->topbar ? m->wy : m->wy + m->wh;
-		m->wy = m->topbar ? m->wy + bh : m->wy;
+		m->wy = m->topbar ? m->wy + bh + sidepad : m->wy;
 	} else
-		m->by = -bh;
+		m->by = -bh -sidepad;
 }
 
 void
