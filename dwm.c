@@ -733,6 +733,7 @@ drawbar(Monitor *m)
 	int x, w, tw = 0, s = 0;
 	int boxs = drw->fonts->h / 9;
 	int boxw = drw->fonts->h / 6 + 2;
+	int margin = drw->fonts->h * 8;
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
 
@@ -770,10 +771,10 @@ drawbar(Monitor *m)
 	drw_map(drw, m->barwins[0], 0, 0, x, bh);
 
 	s = TEXTW(m->sel->name);
-	if ((w = m->ww - tw - x - s) > bh) {
+	if ((w = m->ww - tw - x - margin) > bh) {
 		if (m->sel) {
 			drw_setscheme(drw, scheme[SchemeNorm]);
-			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
+			s = drw_text(drw, x, 0, MIN(s, w), bh, lrpad / 2, m->sel->name, 0) - x;
 			if (m->sel->isfloating)
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
 			XMoveResizeWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - s) / 2, m->by, s, bh);
