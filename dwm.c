@@ -1858,11 +1858,17 @@ unfocus(Client *c, int setfocus)
 void
 unmanage(Client *c, int destroyed)
 {
-	Monitor *m = c->mon;
+	Monitor *m = c->mon, *tmp;
 	XWindowChanges wc;
 
 	detach(c);
 	detachstack(c);
+
+	tmp = selmon; /* cache selmon */
+	selmon = c->mon;
+	incnmaster(&(Arg){.i = 0});
+	selmon = tmp; /* recover selmon */
+
 	if (!destroyed) {
 		wc.border_width = c->oldbw;
 		XGrabServer(dpy); /* avoid race conditions */
