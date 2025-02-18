@@ -447,6 +447,7 @@ buttonpress(XEvent *e)
 		selmon = m;
 		focus(NULL);
 	}
+
 	if (ev->window == selmon->barwins[0]) {
 		i = x = 0;
 		for (c = m->clients; c; c = c->next)
@@ -462,16 +463,23 @@ buttonpress(XEvent *e)
 			arg.ui = 1 << i;
 		} else if (ev->x < x + TEXTW(selmon->ltsymbol))
 			click = ClkLtSymbol;
-		else if (ev->x > selmon->ww - (int)TEXTW(stext))
-			click = ClkStatusText;
-		else
-			click = ClkWinTitle;
-	} else if ((c = wintoclient(ev->window))) {
+	}
+
+	else if (ev->window == selmon->barwins[1]) {
+		click = ClkWinTitle;
+	}
+
+	else if (ev->window == selmon->barwins[2]) {
+		click = ClkStatusText;
+	}
+
+	else if ((c = wintoclient(ev->window))) {
 		focus(c);
 		restack(selmon);
 		XAllowEvents(dpy, ReplayPointer, CurrentTime);
 		click = ClkClientWin;
 	}
+
 	for (i = 0; i < LENGTH(buttons); i++)
 		if (click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
 		&& CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
