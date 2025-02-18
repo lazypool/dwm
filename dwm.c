@@ -1020,8 +1020,8 @@ incnmaster(const Arg *arg)
 	int n, a;
 	Client *c;
 	for (n = 0, c = nexttiled(selmon->clients); c; c = nexttiled(c->next), n++);
-	a = n ? ((selmon->nmaster + arg->i) % n + n) % n : 1;
-	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag] = a ? a : n;
+	a = MAX(MIN(selmon->nmaster + arg->i, n), 1);
+	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag] = n ? a : 1;
 }
 
 #ifdef XINERAMA
@@ -1866,11 +1866,17 @@ unfocus(Client *c, int setfocus)
 void
 unmanage(Client *c, int destroyed)
 {
-	Monitor *m = c->mon;
+	Monitor *m = c->mon, *tmp;
 	XWindowChanges wc;
 
 	detach(c);
 	detachstack(c);
+
+	tmp = selmon; /* cache selmon */
+	selmon = c->mon;
+	incnmaster(&(Arg){.i = 0});
+	selmon = tmp; /* recover selmon */
+
 	if (!destroyed) {
 		wc.border_width = c->oldbw;
 		XGrabServer(dpy); /* avoid race conditions */
