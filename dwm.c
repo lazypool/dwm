@@ -587,7 +587,7 @@ configurenotify(XEvent *e)
 	Monitor *m;
 	Client *c;
 	XConfigureEvent *ev = &e->xconfigure;
-	int dirty;
+	int dirty, i;
 
 	/* TODO: updategeom handling sucks, needs to be simplified */
 	if (ev->window == root) {
@@ -601,7 +601,8 @@ configurenotify(XEvent *e)
 				for (c = m->clients; c; c = c->next)
 					if (c->isfullscreen)
 						resizeclient(c, m->mx, m->my, m->mw, m->mh);
-				XMoveResizeWindow(dpy, m->barwins[0], m->wx, m->by, m->ww, bh);
+				for (i = 0; i < 3; i++)
+					XMoveResizeWindow(dpy, m->barwins[i], m->wx, m->by, m->ww, bh);
 			}
 			focus(NULL);
 			arrange(NULL);
