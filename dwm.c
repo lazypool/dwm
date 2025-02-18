@@ -1012,8 +1012,8 @@ incnmaster(const Arg *arg)
 	int n, a;
 	Client *c;
 	for (n = 0, c = nexttiled(selmon->clients); c; c = nexttiled(c->next), n++);
-	a = n ? ((selmon->nmaster + arg->i) % n + n) % n : 1;
-	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag] = a ? a : n;
+	a = MAX(MIN(selmon->nmaster + arg->i, n), 1);
+	selmon->nmaster = selmon->pertag->nmasters[selmon->pertag->curtag] = n ? a : 1;
 }
 
 #ifdef XINERAMA
