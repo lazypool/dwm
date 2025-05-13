@@ -7,10 +7,10 @@ tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
 
 update() {
 	[ ! "$(command -v date)" ] && echo command not found: date && return
-	time_text=" $(date '+%m/%d %H:%M') "
+	time_text="$(date '+%m/%d %H:%M')"
 	time_icon="  "
 	sed -i '/^export '$_this'=.*$/d' $tmpfile
-	printf "export %s='%s%s'\n" "$_this" "$time_icon" "$time_text" >> $tmpfile
+	printf "export %s=' %s%s '\n" "$_this" "$time_icon" "$time_text" >> $tmpfile
 }
 
 notify() {
