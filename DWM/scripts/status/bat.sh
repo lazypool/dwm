@@ -7,10 +7,10 @@ tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
 
 update() {
 	[ ! "$(command -v acpi)" ] && echo command not found: acpi && return
-	bat_text="$(acpi -b | sed '2,$d' | awk '{print $4}' | grep -Eo "[0-9]+")%"
+	bat_text="$(acpi -b | sed '2,$d' | grep -oP '\d+%')"
 	bat_icon="  "
-	charging=$(acpi -b | grep -q 'Battery 0.*Discharging' && echo "false" || echo "true")
-	_time="Available: <b><span color='#ff79c6'>$(acpi | sed 's/^Battery 0: //g' | awk -F ',' '{print $3}' | sed 's/^[ ]//g' | awk '{print $1}')<\/span><\/b>"
+	charging=$(acpi -b | sed '2,$d' | grep -q 'Discharging' && echo "false" || echo "true")
+	_time="Available: <b><span color='#ff79c6'>$(acpi -b | sed '2,$d' | awk -F'[,:]' '{printf "%dh %dmin", $4, $5}')<\/span><\/b>"
 	sed -i '/^export '$_this'=.*$/d' $tmpfile
 	printf "export %s=' %s%s '\n" "$_this" "$bat_icon" "$bat_text" >> $tmpfile
 }
@@ -18,7 +18,7 @@ update() {
 notify() {
 	update
 	[ "$charging" = "true" ] && _time=""
-	notify-send " Battery     " "\nRemaining:<span color='#bd93f9'>$bat_text<\/span>\n$_time" -r 9527
+	notify-send " Battery" "\nRemaining: <span color='#bd93f9'>$bat_text<\/span>\n$_time" -r 9527
 }
 
 click() {
