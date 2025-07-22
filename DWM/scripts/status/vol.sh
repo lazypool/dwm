@@ -8,7 +8,7 @@ tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
 update() {
 	[ ! "$(command -v pactl)" ] && echo command not found: pactl && return
 	vol_text=$(pactl get-sink-volume @DEFAULT_SINK@ | awk '/Volume:/ {print $5}')
-	vol_icon="  "
+	vol_icon=""
 	sed -i '/^export '$_this'=.*$/d' $tmpfile
 	printf "export %s=' %s%s '\n" "$_this" "$vol_icon" "$vol_text" >> $tmpfile
 }
