@@ -1,0 +1,36 @@
+#!/bin/bash
+# 音乐脚本
+# 需要 mpd, mpc
+
+_this=_music
+tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
+
+update() {
+	[ ! "$(command -v mpd)" ] && echo command not found: mpd && return
+	[ ! "$(command -v mpc)" ] && echo command not found: mpc && return
+	music_text=$(mpc current | sed 's/"/\\"/g')
+	music_icon=$([ "$(mpc status | grep "paused")" ] && echo "" || echo "")
+	sed -i '/^export '$_this'=.*$/d' $tmpfile
+	[ ! "$music_text" ] && return
+	printf "export %s=' %s%s '\n" "$_this" "$music_icon" "$music_text" >> $tmpfile
+}
+
+notify() {
+	update
+	notify-send "$music_icon Music" "$music_text" -r 9527
+}
+
+click() {
+	case "$1" in
+		L) mpc toggle; notify ;;
+		R) mpc pause; notify ;;
+		U) mpc prev; notify ;;
+		D) mpc next; notify ;;
+	esac
+}
+
+case "$1" in
+	click) click $2 ;;
+	notify) notify ;;
+	*) update ;;
+esac
