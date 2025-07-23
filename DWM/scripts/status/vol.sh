@@ -10,7 +10,7 @@ update() {
 	vol_text=$(pactl get-sink-volume @DEFAULT_SINK@ | awk '/Volume:/ {print $5}')
 	vol_icon=""
 	sed -i '/^export '$_this'=.*$/d' $tmpfile
-	printf "export %s=' %s%s '\n" "$_this" "$vol_icon" "$vol_text" >> $tmpfile
+	printf "export %s=' %s%s'\n" "$_this" "$vol_icon" "$vol_text" >> $tmpfile
 }
 
 notify() {

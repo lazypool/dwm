@@ -12,7 +12,7 @@ update() {
 	music_icon=$([ "$(mpc status | grep "paused")" ] && echo "" || echo "")
 	sed -i '/^export '$_this'=.*$/d' $tmpfile
 	[ ! "$music_text" ] && return
-	printf "export %s=' %s%s '\n" "$_this" "$music_icon" "$music_text" >> $tmpfile
+	printf "export %s=' %s%s'\n" "$_this" "$music_icon" "$music_text" >> $tmpfile
 }
 
 notify() {

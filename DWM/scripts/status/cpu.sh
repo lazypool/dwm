@@ -13,7 +13,7 @@ update() {
 	temp_text=$(sensors | grep Tctl | awk '{printf "%d°C", $2}')
 	temp_icon=""
 	sed -i '/^export '$_this'=.*$/d' $tmpfile
-	printf "export %s=' %s%s %s%s '\n" "$_this" "$cpu_icon" "$cpu_text" "$temp_icon" "$temp_text" >> $tmpfile
+	printf "export %s=' %s%s %s%s'\n" "$_this" "$cpu_icon" "$cpu_text" "$temp_icon" "$temp_text" >> $tmpfile
 }
 
 notify() {

@@ -13,7 +13,7 @@ update() {
 	mem_text=$(echo $(((mem_tota - mem_free - mem_buff - mem_cach) * 100 / mem_tota)) | awk '{printf "%02d%", $1}')
 	mem_icon=""
 	sed -i '/^export '$_this'=.*$/d' $tmpfile
-	printf "export %s=' %s%s '\n" "$_this" "$mem_icon" "$mem_text" >> $tmpfile
+	printf "export %s=' %s%s'\n" "$_this" "$mem_icon" "$mem_text" >> $tmpfile
 }
 
 notify() {

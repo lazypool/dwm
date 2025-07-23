@@ -12,7 +12,7 @@ update() {
 	charging=$(acpi -b | sed '2,$d' | grep -q 'Discharging' && echo "false" || echo "true")
 	_time="Available: <b><span color='#ff79c6'>$(acpi -b | sed '2,$d' | awk -F'[,:]' '{printf "%dh %dmin", $4, $5}')<\/span><\/b>"
 	sed -i '/^export '$_this'=.*$/d' $tmpfile
-	printf "export %s=' %s%s '\n" "$_this" "$bat_icon" "$bat_text" >> $tmpfile
+	printf "export %s=' %s%s'\n" "$_this" "$bat_icon" "$bat_text" >> $tmpfile
 }
 
 notify() {
