@@ -11,7 +11,7 @@ update() {
 	wifi_text=$(nmcli | grep "connected to" | awk -F " connected to " '{print $2}')
 	[ ! "$wifi_text" ] && wifi_text="disconnected"
 	wifi_icon=""
-	printf "export %s=' %s%s'\n" "$_this" "$wifi_icon" "$wifi_text" >> $tmpfile
+	printf "export %s=' %s'\n" "$_this" "$wifi_icon" >> $tmpfile
 }
 
 notify() {
