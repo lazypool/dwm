@@ -28,6 +28,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <limits.h>
+#include <stdint.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <X11/cursorfont.h>
@@ -60,7 +62,7 @@
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
 enum { SchemeNorm, SchemeSel }; /* color schemes */
-enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
+enum { NetSupported, NetWMName, NetWMIcon, NetWMState, NetWMCheck,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
        NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
@@ -94,6 +96,8 @@ struct Client {
 	int bw, oldbw;
 	unsigned int tags;
 	int isfixed, isfloating, isglobal, isurgent, neverfocus, oldstate, isfullscreen;
+	unsigned int icw, ich;
+	Picture icon;
 	Client *next;
 	Client *snext;
 	Monitor *mon;
@@ -173,6 +177,7 @@ static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
 static Atom getatomprop(Client *c, Atom prop);
+static Picture geticonprop(Window win, unsigned int *picw, unsigned *pich);
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
 static int gettextprop(Window w, Atom atom, char *text, unsigned int size);
@@ -218,6 +223,7 @@ static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
 static void toggleglobal(const Arg *arg);
 static void toggleview(const Arg *arg);
+static void freeicon(Client *c);
 static void transfer(const Arg *arg);
 static void unfocus(Client *c, int setfocus);
 static void unmanage(Client *c, int destroyed);
@@ -230,6 +236,7 @@ static void updatenumlockmask(void);
 static void updatesizehints(Client *c);
 static void updatestatus(void);
 static void updatetitle(Client *c);
+static void updateicon(Client	*c);
 static void updatewindowtype(Client *c);
 static void updatewmhints(Client *c);
 static void view(const Arg *arg);
@@ -739,7 +746,7 @@ dirtomon(int dir)
 void
 drawbar(Monitor *m)
 {
-	int x, w, tw = 0, s = 0;
+	int x, w, tw = 0, s = 0, v;
 	int boxs = drw->fonts->h / 9;
 	int boxw = drw->fonts->h / 6 + 2;
 	int margin = drw->fonts->h * 8;
@@ -783,7 +790,9 @@ drawbar(Monitor *m)
 	if ((w = m->ww - tw - x - margin) > bh) {
 		if (m->sel) {
 			drw_setscheme(drw, scheme[SchemeNorm]);
-			s = drw_text(drw, x, 0, MIN(s, w), bh, lrpad / 2, m->sel->name, 0) - x;
+			v = m->sel->icon ? m->sel->icw + iconspacing : 0;
+			s = drw_text(drw, x, 0, MIN(s + v, w), bh, lrpad / 2 + v, m->sel->name, 0) - x;
+			if (m->sel->icon) drw_pic(drw, x + lrpad / 2, (bh - m->sel->ich) / 2, m->sel->icw, m->sel->ich, m->sel->icon);
 			if (m->sel->isfloating)
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
 			XMoveResizeWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - s) / 2, m->by, s, bh);
@@ -921,6 +930,37 @@ getatomprop(Client *c, Atom prop)
 		XFree(p);
 	}
 	return atom;
+}
+
+Picture
+geticonprop(Window win, unsigned int *picw, unsigned int *pich)
+{
+	Atom real;
+	int format;
+	unsigned long n, extra, *p = NULL;
+	if (XGetWindowProperty(dpy, win, netatom[NetWMIcon], 0L, LONG_MAX, False, AnyPropertyType,
+		&real, &format, &n, &extra, (unsigned char **)&p) != Success || !n || format != 32)
+		{ XFree(p); return None; }
+
+	unsigned long *bstp = NULL;
+	uint32_t bstd = UINT32_MAX, w, h, sz;
+	for (unsigned long *i = p, *end = p + n; i < end - 1; i += sz) {
+		if (((w = *i++) >= 16384) || ((h = *i++) >= 16384) || (sz = w * h) > end - i)
+			break;
+		uint32_t diff = abs((int)MAX(w, h) - iconsize);
+		if (diff < bstd) { bstd = diff; bstp = i; }
+	}
+	if (!bstp || !(w = bstp[-2]) || !(h = bstp[-1])) { XFree(p); return None; }
+
+	*picw = w <= h ? MAX(w * iconsize / h, 1) : iconsize;
+	*pich = w <= h ? iconsize : MAX(h * iconsize / w, 1);
+	uint32_t i, a, *bstp32 = (uint32_t *)bstp;
+	for (sz = w * h, i = 0, a = bstp[i]; i < sz; a = bstp[++i])
+		bstp32[i] = ((((a >> 24u) * (a & 0xFF00FFu)) >> 8u) & 0xFF00FFu) |
+			((((a >> 24u) * (a & 0x00FF00u)) >> 8u) & 0x00FF00u) | (a & 0xFF000000);
+
+	Picture ret = drw_picture_create_resized(drw, (char *)bstp, w, h, *picw, *pich);
+	XFree(p); return ret;
 }
 
 int
@@ -1093,6 +1133,7 @@ manage(Window w, XWindowAttributes *wa)
 	c->h = c->oldh = wa->height;
 	c->oldbw = wa->border_width;
 
+	updateicon(c);
 	updatetitle(c);
 	if (XGetTransientForHint(dpy, w, &trans) && (t = wintoclient(trans))) {
 		c->mon = t->mon;
@@ -1305,6 +1346,11 @@ propertynotify(XEvent *e)
 		}
 		if (ev->atom == XA_WM_NAME || ev->atom == netatom[NetWMName]) {
 			updatetitle(c);
+			if (c == c->mon->sel)
+				drawbar(c->mon);
+		}
+		else if (ev->atom == netatom[NetWMIcon]) {
+			updateicon(c);
 			if (c == c->mon->sel)
 				drawbar(c->mon);
 		}
@@ -1638,6 +1684,7 @@ setup(void)
 	netatom[NetActiveWindow] = XInternAtom(dpy, "_NET_ACTIVE_WINDOW", False);
 	netatom[NetSupported] = XInternAtom(dpy, "_NET_SUPPORTED", False);
 	netatom[NetWMName] = XInternAtom(dpy, "_NET_WM_NAME", False);
+	netatom[NetWMIcon] = XInternAtom(dpy, "_NET_WM_ICON", False);
 	netatom[NetWMState] = XInternAtom(dpy, "_NET_WM_STATE", False);
 	netatom[NetWMCheck] = XInternAtom(dpy, "_NET_SUPPORTING_WM_CHECK", False);
 	netatom[NetWMFullscreen] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
@@ -1834,6 +1881,15 @@ toggleview(const Arg *arg)
 }
 
 void
+freeicon(Client *c)
+{
+	if (c->icon) {
+		XRenderFreePicture(dpy, c->icon);
+		c->icon	= None;
+	}
+}
+
+void
 transfer(const Arg *arg)
 {
 	Client *c, *mtail, *stail, *insertafter;
@@ -1880,6 +1936,7 @@ unmanage(Client *c, int destroyed)
 
 	detach(c);
 	detachstack(c);
+	freeicon(c);
 
 	tmp = selmon; /* cache selmon */
 	selmon = c->mon;
@@ -2125,6 +2182,13 @@ updatetitle(Client *c)
 		gettextprop(c->win, XA_WM_NAME, c->name, sizeof c->name);
 	if (c->name[0] == '\0') /* hack to mark broken clients */
 		strcpy(c->name, broken);
+}
+
+void
+updateicon(Client *c)
+{
+	freeicon(c);
+	c->icon = geticonprop(c->win, &c->icw, &c->ich);
 }
 
 void
