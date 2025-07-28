@@ -13,7 +13,7 @@ update() {
 	music_icon=""
 	sed -i '/^export '$_this'=.*$/d' $tmpfile
 	[ ! "$music_text" ] && return
-	printf "export %s=' %s%s'\n" "$_this" "$music_icon" >> $tmpfile
+	printf "export %s=' %s'\n" "$_this" "$music_icon" >> $tmpfile
 }
 
 notify() {
