@@ -124,6 +124,7 @@ struct Monitor {
 	int by;               /* bar geometry */
 	int mx, my, mw, mh;   /* screen size */
 	int wx, wy, ww, wh;   /* window area  */
+	int pvs;              /* previous title size */
 	unsigned int seltags;
 	unsigned int sellt;
 	unsigned int tagset[2];
@@ -791,14 +792,14 @@ drawbar(Monitor *m)
 		if (m->sel) {
 			drw_setscheme(drw, scheme[SchemeNorm]);
 			v = m->sel->icon ? m->sel->icw + iconspacing : 0;
-			s = drw_text(drw, x, 0, MIN(s + v, w), bh, lrpad / 2 + v, m->sel->name, 0) - x;
+			s = m->pvs = drw_text(drw, x, 0, MIN(s + v, w), bh, lrpad / 2 + v, m->sel->name, 0) - x;
 			if (m->sel->icon) drw_pic(drw, x + lrpad / 2, (bh - m->sel->ich) / 2, m->sel->icw, m->sel->ich, m->sel->icon);
 			if (m->sel->isfloating)
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
 			XMoveResizeWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - s) / 2, m->by, s, bh);
 			drw_map(drw, m->barwins[1], x, 0, w, bh);
 		} else {
-			XMoveWindow(dpy, m->barwins[1], m->wx + m->ww / 2, -2 * bh);
+			XMoveWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - m->pvs) / 2, -2 * bh);
 		}
 	}
 }
@@ -2098,6 +2099,7 @@ updategeom(void)
 			mons->mw = mons->ww = sw;
 			mons->mh = mons->wh = sh;
 			updatebarpos(mons);
+			mons->pvs = 0;
 		}
 	}
 	if (dirty) {
