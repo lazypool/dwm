@@ -11,11 +11,12 @@ settings() {
 
 daemons() {
     [ $1 ] && sleep $1
+    $_thisdir/scripts/statusbar.sh cron &   # 开启状态栏定时更新
     xss-lock -- $_thisdir/scripts/blurlock.sh & # 开启自动锁屏程序
     fcitx5 &                                    # 开启输入法
     flameshot &                                 # 截图要跑一个程序在后台 不然无法将截图保存到剪贴板
     dunst -conf $_thisdir/scripts/config/dunst.conf & # 开启通知server
-    picom --experimental-backends --config $_thisdir/scripts/config/picom.conf >> /dev/null 2>&1 & # 开启picom
+    picom --config $_thisdir/scripts/config/picom.conf >> /dev/null 2>&1 & # 开启picom
 }
 
 cron() {
