@@ -3,7 +3,7 @@
 # 需要 mpd, mpc
 
 _this=_music
-tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
+tmpfile=/tmp/dwm_statusbar
 
 update() {
 	[ ! "$(command -v mpd)" ] && echo command not found: mpd && return

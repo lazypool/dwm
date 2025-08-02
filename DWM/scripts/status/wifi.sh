@@ -3,7 +3,7 @@
 # 需要 nmcli
 
 _this=_wifi
-tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
+tmpfile=/tmp/dwm_statusbar
 
 update() {
 	[ ! "$(command -v nmcli)" ] && echo command not found: nmcli && return

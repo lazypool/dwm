@@ -3,7 +3,7 @@
 # 需要安装 acpi
 
 _this=_bat
-tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
+tmpfile=/tmp/dwm_statusbar
 
 update() {
 	[ ! "$(command -v acpi)" ] && echo command not found: acpi && return

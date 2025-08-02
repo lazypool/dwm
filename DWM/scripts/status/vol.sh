@@ -3,7 +3,7 @@
 # 需要 pactl
 
 _this=_vol
-tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
+tmpfile=/tmp/dwm_statusbar
 
 update() {
 	[ ! "$(command -v pactl)" ] && echo command not found: pactl && return

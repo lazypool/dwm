@@ -3,7 +3,7 @@
 # 需要 top, sensors
 
 _this=_cpu
-tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
+tmpfile=/tmp/dwm_statusbar
 
 update() {
 	[ ! "$(command -v top)" ] && echo command not found: top && return

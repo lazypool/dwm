@@ -3,7 +3,7 @@
 # 需要 date 命令
 
 _this=_date
-tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
+tmpfile=/tmp/dwm_statusbar
 
 update() {
 	[ ! "$(command -v date)" ] && echo command not found: date && return
