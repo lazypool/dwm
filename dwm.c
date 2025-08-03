@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 #include <limits.h>
 #include <stdint.h>
@@ -161,6 +162,7 @@ static void checkotherwm(void);
 static void cleanup(void);
 static void cleanupmon(Monitor *mon);
 static void clientmessage(XEvent *e);
+static void clkstatusbar(const Arg *arg);
 static void configure(Client *c);
 static void configurenotify(XEvent *e);
 static void configurerequest(XEvent *e);
@@ -479,6 +481,8 @@ buttonpress(XEvent *e)
 
 	else if (ev->window == selmon->barwins[2]) {
 		click = ClkStatusText;
+		arg.i = ev->x - (selmon->ww - (TEXTW(stext) - lrpad + 2));
+		arg.ui = ev->button;
 	}
 
 	else if ((c = wintoclient(ev->window))) {
@@ -568,6 +572,20 @@ clientmessage(XEvent *e)
 		if (c != selmon->sel && !c->isurgent)
 			seturgent(c, 1);
 	}
+}
+
+void
+clkstatusbar(const Arg *arg)
+{
+	static unsigned long last;
+	struct timespec now;
+	unsigned long current;
+
+	// throttling
+	clock_gettime(CLOCK_MONOTONIC, &now);
+	current = now.tv_sec * 1000UL + now.tv_nsec / 1000000UL;
+	if (current - last < 100) return;
+	else last = current;
 }
 
 void
