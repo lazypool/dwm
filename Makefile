@@ -1,6 +1,5 @@
 # dwm - dynamic window manager
 # See LICENSE file for copyright and license details.
-VERSION = 6.4
 
 # paths
 PREFIX = /usr/local
