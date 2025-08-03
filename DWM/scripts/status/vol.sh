@@ -6,7 +6,7 @@ _this=_vol
 tmpfile=/tmp/dwm_statusbar
 
 update() {
-	[ ! "$(command -v pactl)" ] && echo command not found: pactl && return
+	[[ ! "$(command -v pactl)" ]] && echo command not found: pactl && return
 	vol_text=$(pactl get-sink-volume @DEFAULT_SINK@ | awk '/Volume:/ {print $5}')
 	vol_icon=""
 	sed -i '/^export '$_this'=.*$/d' $tmpfile

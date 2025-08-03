@@ -6,7 +6,7 @@ _this=_date
 tmpfile=/tmp/dwm_statusbar
 
 update() {
-	[ ! "$(command -v date)" ] && echo command not found: date && return
+	[[ ! "$(command -v date)" ]] && echo command not found: date && return
 	time_text=$(date '+%H:%M')
 	time_icon=""
 	sed -i '/^export '$_this'=.*$/d' $tmpfile

@@ -6,10 +6,10 @@ _this=_wifi
 tmpfile=/tmp/dwm_statusbar
 
 update() {
-	[ ! "$(command -v nmcli)" ] && echo command not found: nmcli && return
+	[[ ! "$(command -v nmcli)" ]] && echo command not found: nmcli && return
 	sed -i '/^export '$_this'=.*$/d' $tmpfile
 	wifi_text=$(nmcli | grep "connected to" | awk -F " connected to " '{print $2}')
-	[ ! "$wifi_text" ] && wifi_text="disconnected"
+	[[ ! "$wifi_text" ]] && wifi_text="disconnected"
 	wifi_icon=""
 	printf "export %s=' %s'\n" "$_this" "$wifi_icon" >> $tmpfile
 }

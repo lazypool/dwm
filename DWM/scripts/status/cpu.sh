@@ -6,8 +6,8 @@ _this=_cpu
 tmpfile=/tmp/dwm_statusbar
 
 update() {
-	[ ! "$(command -v top)" ] && echo command not found: top && return
-	[ ! "$(command -v sensors)" ] && echo command not found: sensors && return
+	[[ ! "$(command -v top)" ]] && echo command not found: top && return
+	[[ ! "$(command -v sensors)" ]] && echo command not found: sensors && return
 	cpu_text=$(top -n 1 -b | sed -n '3p' | awk '{printf "%02d%", 100 - $8}')
 	cpu_icon=""
 	temp_text=$(sensors | grep Tctl | awk '{printf "%d°C", $2}')

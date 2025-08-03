@@ -6,8 +6,8 @@ touch $tmpfile
 
 # 更新模块内容
 update() {
-	[ ! "$1" ] && refresh && return
-	[ -e "$_thisdir/status/$1.sh" ] && bash $_thisdir/status/$1.sh
+	[[ ! "$1" ]] && refresh && return
+	[[ -e "$_thisdir/status/$1.sh" ]] && bash $_thisdir/status/$1.sh
 	shift 1; update $*
 }
 
@@ -24,11 +24,11 @@ cron() {
 	let i=0
 	while true; do
 		to=()
-		[ $((i % 10)) -eq 0 ]  && to=(${to[@]} wifi)
-		[ $((i % 20)) -eq 0 ]  && to=(${to[@]} cpu mem vol icons)
-		[ $((i % 300)) -eq 0 ] && to=(${to[@]} bat)
-		[ $((i % 5)) -eq 0 ]   && to=(${to[@]} date music)
-		[ $i -lt 30 ] && to=(wifi cpu mem date vol icons bat music)
+		[[ $((i % 10)) -eq 0 ]]  && to=(${to[@]} wifi)
+		[[ $((i % 20)) -eq 0 ]]  && to=(${to[@]} cpu mem vol)
+		[[ $((i % 300)) -eq 0 ]] && to=(${to[@]} bat)
+		[[ $((i % 5)) -eq 0 ]]   && to=(${to[@]} date music)
+		[[ $i -lt 30 ]] && to=(wifi cpu mem date vol bat music)
 		update ${to[@]}
 		sleep 5; let i+=5
 	done &
@@ -36,8 +36,9 @@ cron() {
 
 # 状态栏点击
 click() {
-	[ ! "$1" ] && return
-	bash $_thisdir/status/$1.sh click $2
+	[[ ! "$1" =~ ^[0-9]$ ]] && return
+	to=(music wifi cpu cpu mem date vol bat)
+	bash $_thisdir/status/${to[$1]}.sh click $2
 	update $1
 	refresh
 }
@@ -45,6 +46,6 @@ click() {
 case $1 in
 	cron) cron ;;
 	update) shift 1; update $* ;;
-	updateall|check) update icons music wifi cpu mem date vol bat ;;
+	updateall|check) update music wifi cpu mem date vol bat ;;
 	*) click $1 $2 ;;
 esac
