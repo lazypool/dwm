@@ -125,7 +125,7 @@ struct Monitor {
 	int by;               /* bar geometry */
 	int mx, my, mw, mh;   /* screen size */
 	int wx, wy, ww, wh;   /* window area  */
-	int pvs;              /* previous title size */
+	int pvx, pvs;         /* tags & title size */
 	unsigned int seltags;
 	unsigned int sellt;
 	unsigned int tagset[2];
@@ -801,7 +801,7 @@ drawbar(Monitor *m)
 	}
 	w = TEXTW(m->ltsymbol);
 	drw_setscheme(drw, scheme[SchemeNorm]);
-	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
+	x = m->pvx = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 	XMoveResizeWindow(dpy, m->barwins[0], m->wx, m->by, x, bh);
 	drw_map(drw, m->barwins[0], 0, 0, x, bh);
 
@@ -1853,7 +1853,10 @@ togglebar(const Arg *arg)
 {
 	selmon->showbar = !selmon->showbar;
 	updatebarpos(selmon);
-	XMoveResizeWindow(dpy, selmon->barwins[0], selmon->wx, selmon->by, selmon->ww, bh);
+	int tw = TEXTW(stext) - lrpad + 2, x = selmon->pvx, s = selmon->pvs;
+	XMoveWindow(dpy, selmon->barwins[0], selmon->wx, selmon->by);
+	XMoveWindow(dpy, selmon->barwins[1], selmon->wx + (selmon->ww - tw + x - s) / 2, selmon->by);
+	XMoveWindow(dpy, selmon->barwins[2], selmon->wx + selmon->ww - tw, selmon->by);
 	arrange(selmon);
 }
 
@@ -2117,7 +2120,7 @@ updategeom(void)
 			mons->mw = mons->ww = sw;
 			mons->mh = mons->wh = sh;
 			updatebarpos(mons);
-			mons->pvs = 0;
+			mons->pvx = mons->pvs = 0;
 		}
 	}
 	if (dirty) {
