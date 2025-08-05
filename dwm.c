@@ -70,7 +70,7 @@ enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms *
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
        ClkClientWin, ClkRootWin, ClkLast }; /* clicks */
 
-typedef union {
+typedef struct {
 	int i;
 	unsigned int ui;
 	float f;
@@ -481,7 +481,7 @@ buttonpress(XEvent *e)
 
 	else if (ev->window == selmon->barwins[2]) {
 		click = ClkStatusText;
-		arg.i = ev->x - (selmon->ww - (TEXTW(stext) - lrpad + 2));
+		arg.i = ev->x;
 		arg.ui = ev->button;
 	}
 
@@ -495,7 +495,8 @@ buttonpress(XEvent *e)
 	for (i = 0; i < LENGTH(buttons); i++)
 		if (click == buttons[i].click && buttons[i].func && buttons[i].button == ev->button
 		&& CLEANMASK(buttons[i].mask) == CLEANMASK(ev->state))
-			buttons[i].func(click == ClkTagBar && buttons[i].arg.i == 0 ? &arg : &buttons[i].arg);
+			buttons[i].func((click == ClkTagBar || click == ClkWinTitle || click == ClkStatusText)
+			&& buttons[i].arg.i == 0 ? &arg : &buttons[i].arg);
 }
 
 void
@@ -580,12 +581,38 @@ clkstatusbar(const Arg *arg)
 	static unsigned long last;
 	struct timespec now;
 	unsigned long current;
+	int n = 0, ptr = 0, len;
+	char *text, *btn = "L", *cmd;
+
+	if (!arg->i || arg->i <= 0) return;
 
 	// throttling
 	clock_gettime(CLOCK_MONOTONIC, &now);
 	current = now.tv_sec * 1000UL + now.tv_nsec / 1000000UL;
 	if (current - last < 100) return;
 	else last = current;
+
+	text = (char *)malloc(256 * sizeof(char));
+	strcpy(text, stext);
+	while (text[++ptr]) {
+		if (text[ptr] != ' ') continue;
+		text[ptr] = '\0';
+		len = TEXTW(text) - lrpad;
+		text[ptr] = ' ';
+		n += (len < arg->i);
+	}
+
+	switch (arg->ui) {
+		case Button1: btn = "L"; break;
+		case Button2: btn = "M"; break;
+		case Button3: btn = "R"; break;
+		case Button4: btn = "U"; break;
+		case Button5: btn = "D"; break;
+	}
+
+	cmd = (char *)malloc(256 * sizeof(char));
+	sprintf(cmd, "%s %d %s &", statusbarscript, n, btn);
+	system(cmd); free(cmd); free(text);
 }
 
 void
