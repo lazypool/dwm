@@ -8,7 +8,7 @@
 
 INNER_PORT=eDP-1
 MODE=LR
-[ "$(xrandr | grep '3440x1440')" ] && MODE=H$MODE
+[[ "$(xrandr | grep '3440x1440')" ]] && MODE=H$MODE
 
 __setbg() {
 	feh --randomize --bg-fill ~/Pictures/wallpaper/*.png
@@ -46,7 +46,7 @@ one() {
 
 two() {
 	OUTPORT_CONNECTED=$(xrandr | grep -v $INNER_PORT | grep -w 'connected' | awk '{print $1}')
-	[ ! "$OUTPORT_CONNECTED" ] && one && return
+	[[ ! "$OUTPORT_CONNECTED" ]] && one && return
 	xrandr $(__get_off_views) $(__get_inner_view) $(__get_outer_view $OUTPORT_CONNECTED)
 	__setbg
 }
@@ -54,8 +54,8 @@ two() {
 check() {
 	CONNECTED_PORTS=$(xrandr | grep -w 'connected' | awk '{print $1}' | wc -l)
 	CONNECTED_MONITORS=$(xrandr --listmonitors | sed 1d | awk '{print $4}' | wc -l)
-	[ $CONNECTED_PORTS -gt $CONNECTED_MONITORS ] && two
-	[ $CONNECTED_PORTS -lt $CONNECTED_MONITORS ] && one
+	[[ $CONNECTED_PORTS -gt $CONNECTED_MONITORS ]] && two
+	[[ $CONNECTED_PORTS -lt $CONNECTED_MONITORS ]] && one
 }
 
 case $1 in

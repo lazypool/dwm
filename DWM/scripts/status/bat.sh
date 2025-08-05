@@ -3,10 +3,10 @@
 # 需要安装 acpi
 
 _this=_bat
-tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
+tmpfile=/tmp/dwm_statusbar
 
 update() {
-	[ ! "$(command -v acpi)" ] && echo command not found: acpi && return
+	[[ ! "$(command -v acpi)" ]] && echo command not found: acpi && return
 	bat_text=$(acpi -b | sed '2,$d' | grep -oP '\d+%')
 	bat_icon=""
 	charging=$(acpi -b | sed '2,$d' | grep -q 'Discharging' && echo "false" || echo "true")
@@ -17,7 +17,7 @@ update() {
 
 notify() {
 	update
-	[ "$charging" = "true" ] && _time=""
+	[[ "$charging" = "true" ]] && _time=""
 	notify-send " Battery" "Remaining: <span color='#bd93f9'>$bat_text<\/span>\n$_time" -r 9527
 }
 

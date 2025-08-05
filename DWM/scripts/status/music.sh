@@ -3,16 +3,16 @@
 # 需要 mpd, mpc
 
 _this=_music
-tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
+tmpfile=/tmp/dwm_statusbar
 
 update() {
-	[ ! "$(command -v mpd)" ] && echo command not found: mpd && return
-	[ ! "$(command -v mpc)" ] && echo command not found: mpc && return
+	[[ ! "$(command -v mpd)" ]] && echo command not found: mpd && return
+	[[ ! "$(command -v mpc)" ]] && echo command not found: mpc && return
 	music_text=$(mpc current | sed 's/"/\\"/g')
-	[ ! "$music_text" ] && music_text="No Playing"
+	[[ ! "$music_text" ]] && music_text="No Playing"
 	music_icon=""
 	sed -i '/^export '$_this'=.*$/d' $tmpfile
-	[ ! "$music_text" ] && return
+	[[ ! "$music_text" ]] && return
 	printf "export %s=' %s'\n" "$_this" "$music_icon" >> $tmpfile
 }
 

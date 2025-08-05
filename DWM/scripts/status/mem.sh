@@ -2,10 +2,10 @@
 # 获取当前内存使用
 
 _this=_mem
-tmpfile=$(cd $(dirname $0);cd ..;pwd)/tmp
+tmpfile=/tmp/dwm_statusbar
 
 update() {
-	[ ! "$(command -v cat)" ] && echo command not found: cat && return
+	[[ ! "$(command -v cat)" ]] && echo command not found: cat && return
 	mem_tota=$(cat /proc/meminfo | grep -w "MemTotal:"| awk '{print $2}')
 	mem_free=$(cat /proc/meminfo | grep -w "MemFree:" | awk '{print $2}')
 	mem_buff=$(cat /proc/meminfo | grep -w "Buffers:" | awk '{print $2}')
