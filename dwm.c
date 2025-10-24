@@ -20,6 +20,7 @@
  *
  * To understand everything else, start reading main().
  */
+#include <X11/X.h>
 #include <locale.h>
 #include <signal.h>
 #include <stdarg.h>
@@ -147,6 +148,7 @@ typedef struct {
 	int isfloating;
 	int isglobal;
 	int monitor;
+	int unmanaged;
 } Rule;
 
 /* function declarations */
@@ -256,6 +258,7 @@ static char stext[256];
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh;               /* bar height */
+static int unmanaged;        /* whether the WM should manage the new window */
 static int lrpad;            /* sum of left and right padding for text */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
@@ -327,6 +330,7 @@ applyrules(Client *c)
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m)
 				c->mon = m;
+			unmanaged = r->unmanaged;
 		}
 	}
 	if (ch.res_class)
@@ -1188,6 +1192,21 @@ manage(Window w, XWindowAttributes *wa)
 		applyrules(c);
 	}
 
+	if (unmanaged) {
+		XMapWindow(dpy, c->win);
+		switch (unmanaged) {
+			case 1: XRaiseWindow(dpy, c->win); break;
+			case 2: XLowerWindow(dpy, c->win); break;
+		}
+		updatewmhints(c);
+		if (!c->neverfocus)
+			XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
+		sendevent(c, wmatom[WMTakeFocus]);
+		free(c);
+		unmanaged = 0;
+		return;
+	}
+
 	if (c->x + WIDTH(c) > c->mon->wx + c->mon->ww)
 		c->x = c->mon->wx + c->mon->ww - WIDTH(c);
 	if (c->y + HEIGHT(c) > c->mon->wy + c->mon->wh)
@@ -1718,6 +1737,7 @@ setup(void)
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts)))
 		die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;
+	unmanaged = 0;
 	bh = drw->fonts->h + 2;
 	updategeom();
 	/* init atoms */

@@ -8,8 +8,8 @@ static const int topbar             = 1;        /* 0 means bottom bar */
 static const int sidepad            = 10;       /* side padding size */
 static const int iconsize           = 40;       /* icon size */
 static const int iconspacing        = 10;       /* space between icon and title */
-static const char *fonts[]          = { "JetBrainsMono Nerd Font:size=24" };
-static const char dmenufont[]       = "JetBrainsMono Nerd Font:size=24";
+static const char *fonts[]          = { "Noto Sans Mono:size=24" };
+static const char dmenufont[]       = "Noto Sans Mono:size=24";
 static const char col_gray1[]       = "#222222";
 static const char col_gray2[]       = "#444444";
 static const char col_gray3[]       = "#bbbbbb";
@@ -33,9 +33,11 @@ static const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class      instance    title       tags mask     isfloating   isglobal  monitor */
-	{ "Gimp",     NULL,       NULL,       0,            1,           0,        -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           0,        -1 },
+	/* class      instance    title               tags mask     isfloating   isglobal  monitor    unmanaged*/
+	{ "Gimp",     NULL,       NULL,               0,            1,           0,        -1,        0 },
+	{ "Firefox",  NULL,       NULL,               1 << 8,       0,           0,        -1,        0 },
+	{ NULL,       NULL,       "Feishu Meetings",  0,            0,           0,        -1,        1 },
+	{ NULL,       NULL,       "broken",           0,            0,           0,        -1,        1 },
 };
 
 /* layout(s) */
