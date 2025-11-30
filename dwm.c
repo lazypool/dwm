@@ -847,7 +847,9 @@ drawbar(Monitor *m)
 			XMoveResizeWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - s) / 2, m->by, s, bh);
 			drw_map(drw, m->barwins[1], x, 0, w, bh);
 		} else {
-			XMoveWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - m->pvs) / 2, -2 * bh);
+			drw_text(drw, x, 0, w, bh, lrpad / 2, "", 0);
+			drw_map(drw, m->barwins[1], x, 0, w, bh);
+			XMoveResizeWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - bh) / 2, m->by, bh, bh);
 		}
 	}
 }
@@ -1738,7 +1740,7 @@ setup(void)
 		die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;
 	unmanaged = 0;
-	bh = drw->fonts->h + 2;
+	bh = drw->fonts->h + 20;
 	updategeom();
 	/* init atoms */
 	utf8string = XInternAtom(dpy, "UTF8_STRING", False);
