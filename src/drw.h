@@ -66,4 +66,4 @@ void drw_pic(Drw *drw, int x, int y, unsigned int w, unsigned int h, Picture pic
 void drw_map(Drw *drw, Window win, int x, int y, unsigned int w, unsigned int h);
 
 // clang-format on
-#endif // !DRW_H
+#endif  // !DRW_H
