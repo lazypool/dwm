@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details. */
+#include <sys/types.h>
 
 #define MAX(A, B)               ((A) > (B) ? (A) : (B))
 #define MIN(A, B)               ((A) < (B) ? (A) : (B))

@@ -36,7 +36,7 @@ all: dwm
 .c.o:
 	${CC} -o $@ -c ${CFLAGS} $<
 
-${OBJ}: config.h
+${OBJ}: config.h dwm.h
 
 dwm: ${OBJ}
 	${CC} -o $@ ${OBJ} ${LDFLAGS}

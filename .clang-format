@@ -1,13 +1,13 @@
 ---
-BasedOnStyle: LLVM
+BasedOnStyle: Google
 Language: C
 
-AlignConsecutiveAssignments: true
+AlignConsecutiveAssignments: false
 AlignConsecutiveDeclarations: false
 AlignConsecutiveMacros: true
 AlignTrailingComments: true
 AlignEscapedNewlines: Right
-AlignOperands: true
+AlignOperands: false
 
 ReflowComments: false
 
@@ -20,16 +20,16 @@ AlignAfterOpenBracket: Align
 AlignArrayOfStructures: Left
 BreakBeforeBraces: Attach
 
-ColumnLimit: 0
+ColumnLimit: 200
 MaxEmptyLinesToKeep: 2
 
-AllowShortFunctionsOnASingleLine: true
-AllowShortIfStatementsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: true
 BinPackArguments: false
 BinPackParameters: false
 IndentCaseLabels: true
 KeepEmptyLinesAtTheStartOfBlocks: false
-PointerAlignment: Left
+PointerAlignment: Right
 SpaceAfterCStyleCast: false
 SpaceBeforeParens: ControlStatements
 SpaceInEmptyParentheses: false
