@@ -12,8 +12,8 @@ const int topbar            = 1;  /* 0 means bottom bar */
 const int sidepad           = 10; /* side padding size */
 const int iconsize          = 40; /* icon size */
 const int iconspacing       = 10; /* space between icon and title */
-const char *fonts[]         = {"JetBrainsMono Nerd Font Mono:size=19"};
-const char dmenufont[]      = "JetBrainsMono Nerd Font Mono:size=19";
+const char *fonts[]         = {"JetBrainsMono Nerd Font Mono:size=12"};
+const char dmenufont[]      = "JetBrainsMono Nerd Font Mono:size=12";
 const char col_gray1[]      = "#222222";
 const char col_gray2[]      = "#444444";
 const char col_gray3[]      = "#bbbbbb";

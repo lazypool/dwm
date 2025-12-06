@@ -30,7 +30,7 @@
 #define HEIGHT(X)                ((X)->h + 2 * (X)->bw)
 #define TAGMASK                  ((1 << MAXTAGS) - 1)
 #define TEXTW(X)                 (drw_fontset_getwidth(drw, (X)) + lrpad)
-#define MAXTAGS                  1 << 3
+#define MAXTAGS                  (1 << 3)
 
 enum { CurNormal, CurResize, CurMove, CurLast };
 enum { SchemeNorm, SchemeSel };
