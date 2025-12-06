@@ -1,0 +1,37 @@
+---
+BasedOnStyle: LLVM
+Language: C
+
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: false
+AlignConsecutiveMacros: true
+AlignTrailingComments: true
+AlignEscapedNewlines: Right
+AlignOperands: true
+
+ReflowComments: false
+
+IndentWidth: 2
+TabWidth: 2
+UseTab: Never
+ContinuationIndentWidth: 2
+
+AlignAfterOpenBracket: Align
+AlignArrayOfStructures: Left
+BreakBeforeBraces: Attach
+
+ColumnLimit: 0
+MaxEmptyLinesToKeep: 2
+
+AllowShortFunctionsOnASingleLine: true
+AllowShortIfStatementsOnASingleLine: false
+BinPackArguments: false
+BinPackParameters: false
+IndentCaseLabels: true
+KeepEmptyLinesAtTheStartOfBlocks: false
+PointerAlignment: Left
+SpaceAfterCStyleCast: false
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInAngles: false
+...
