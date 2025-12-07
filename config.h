@@ -30,7 +30,7 @@ const char *autostartscript = "$DWM/autostart.sh";
 const char *statusbarscript = "$DWM/scripts/statusbar.sh";
 
 /* tags */
-const char *tags[] = {"1", "2", "3", "4", "5", "6", "7", "8"};
+const char *tags[] = {"", "", "", "", "", "", "", ""};
 
 /* rule */
 const Rule rules[] = {
