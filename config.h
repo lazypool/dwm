@@ -5,14 +5,14 @@
 #include "dwm.h"
 
 /* appearance */
-const unsigned int borderpx = 0;  /* border pixel of windows */
+const unsigned int borderpx = 3;  /* border pixel of windows */
 const unsigned int snap     = 32; /* snap pixel */
 const int showbar           = 1;  /* 0 means no bar */
 const int topbar            = 1;  /* 0 means bottom bar */
 const int sidepad           = 10; /* side padding size */
-const int iconsize          = 40; /* icon size */
-const int iconspacing       = 10; /* space between icon and title */
-const char *fonts[]         = {"JetBrainsMono Nerd Font Mono:size=12"};
+const int iconsize          = 19; /* icon size */
+const int iconspacing       = 8;  /* space between icon and title */
+const char *fonts[]         = {"Iosevka:style:medium:size=12" ,"JetBrainsMono Nerd Font Mono:style:medium:size=19" };
 const char dmenufont[]      = "JetBrainsMono Nerd Font Mono:size=12";
 const char col_gray1[]      = "#222222";
 const char col_gray2[]      = "#444444";
@@ -50,12 +50,13 @@ const float mfact        = 0.55; /* factor of master area size [0.05..0.95] */
 const int nmaster        = 1;    /* number of clients in master area */
 const int resizehints    = 0;    /* 1 means respect size hints in tiled resizals */
 const int lockfullscreen = 1;    /* 1 will force focus on the fullscreen window */
+const char *monsyms[]    = {"󰎡", "󰎤", "󰎧", "󰎪", "󰎭", "󰎱", "󰎳", "󰎶", "󰎹", "󰎼", "󰎿"};
 
 const Layout layouts[] = {
   /* symbol  function */
-  {"[]=",    tile   }, /* first entry is default */
-  {"><>",    NULL   }, /* no layout function means floating behavior */
-  {"[M]",    monocle},
+  {"󰙀",    tile   }, /* first entry is default */
+  {"󰗣",    NULL   }, /* no layout function means floating behavior */
+  {"󰎡",    monocle},
 };
 
 /* commands */
