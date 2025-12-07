@@ -224,7 +224,8 @@ void clientmessage(XEvent *e) {
 
   if (!c) return;
   if (cme->message_type == netatom[NetWMState]) {
-    if (cme->data.l[1] == netatom[NetWMFullscreen] || cme->data.l[2] == netatom[NetWMFullscreen]) setfullscreen(c, (cme->data.l[0] == 1 || (cme->data.l[0] == 2 && !c->isfullscreen)));
+    if (cme->data.l[1] == netatom[NetWMFullscreen] || cme->data.l[2] == netatom[NetWMFullscreen])
+      setfullscreen(c, (cme->data.l[0] == 1 || (cme->data.l[0] == 2 && !c->isfullscreen)));
   } else if (cme->message_type == netatom[NetActiveWindow]) {
     if (c != selmon->sel && !c->isurgent) seturgent(c, 1);
   }
@@ -239,7 +240,7 @@ void clkstatusbar(const Arg *arg) {
 
   if (!arg->i || arg->i <= 0) return;
 
-  // throttling
+  /* throttling */
   clock_gettime(CLOCK_MONOTONIC, &now);
   current = now.tv_sec * 1000UL + now.tv_nsec / 1000000UL;
   if (current - last < 100)
@@ -670,7 +671,8 @@ void grabbuttons(Client *c, int focused) {
     if (!focused) XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, BUTTONMASK, GrabModeSync, GrabModeSync, None, None);
     for (i = 0; i < LENGTH(buttons); i++)
       if (buttons[i].click == ClkClientWin)
-        for (j = 0; j < LENGTH(modifiers); j++) XGrabButton(dpy, buttons[i].button, buttons[i].mask | modifiers[j], c->win, False, BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
+        for (j = 0; j < LENGTH(modifiers); j++)
+          XGrabButton(dpy, buttons[i].button, buttons[i].mask | modifiers[j], c->win, False, BUTTONMASK, GrabModeAsync, GrabModeSync, None, None);
   }
 }
 
@@ -1241,7 +1243,8 @@ void setup(void) {
   XDeleteProperty(dpy, root, netatom[NetClientList]);
   /* select events */
   wa.cursor = cursor[CurNormal]->cursor;
-  wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask | ButtonPressMask | PointerMotionMask | EnterWindowMask | LeaveWindowMask | StructureNotifyMask | PropertyChangeMask;
+  wa.event_mask = SubstructureRedirectMask | SubstructureNotifyMask | ButtonPressMask | PointerMotionMask | EnterWindowMask | /* add event mask */
+  LeaveWindowMask | StructureNotifyMask | PropertyChangeMask;
   XChangeWindowAttributes(dpy, root, CWEventMask | CWCursor, &wa);
   XSelectInput(dpy, root, wa.event_mask);
   grabkeys();
@@ -1463,8 +1466,8 @@ void updatebars(void) {
   for (m = mons; m; m = m->next) {
     for (int i = 0; i < 3; i++) {
       if (m->barwins[i]) continue;
-      m->barwins[i] =
-        XCreateWindow(dpy, root, m->wx + m->ww, m->wy + m->wh, bh, bh, 0, DefaultDepth(dpy, screen), CopyFromParent, DefaultVisual(dpy, screen), CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
+      m->barwins[i] = XCreateWindow(dpy, root, m->wx + m->ww, m->wy + m->wh, bh, bh, 0, DefaultDepth(dpy, screen), CopyFromParent, DefaultVisual(dpy, screen),
+                                    CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
       XDefineCursor(dpy, m->barwins[i], cursor[CurNormal]->cursor);
       XMapRaised(dpy, m->barwins[i]);
       XSetClassHint(dpy, m->barwins[i], &ch);

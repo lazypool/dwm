@@ -14,19 +14,19 @@ ReflowComments: false
 IndentWidth: 2
 TabWidth: 2
 UseTab: Never
-ContinuationIndentWidth: 2
+ContinuationIndentWidth: 0
 
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: Left
 BreakBeforeBraces: Attach
 
-ColumnLimit: 200
+ColumnLimit: 180
 MaxEmptyLinesToKeep: 2
 
 AllowShortFunctionsOnASingleLine: false
-AllowShortIfStatementsOnASingleLine: true
-BinPackArguments: false
-BinPackParameters: false
+AllowShortIfStatementsOnASingleLine: WithoutElse
+BinPackArguments: true
+BinPackParameters: true
 IndentCaseLabels: true
 KeepEmptyLinesAtTheStartOfBlocks: false
 PointerAlignment: Right
