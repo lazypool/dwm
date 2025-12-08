@@ -1466,8 +1466,8 @@ void updatebars(void) {
   for (m = mons; m; m = m->next) {
     for (int i = 0; i < 3; i++) {
       if (m->barwins[i]) continue;
-      m->barwins[i] = XCreateWindow(dpy, root, m->wx + m->ww, m->wy + m->wh, bh, bh, 0, DefaultDepth(dpy, screen), CopyFromParent, DefaultVisual(dpy, screen),
-                                    CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
+      m->barwins[i] = XCreateWindow(dpy, root, m->wx + m->ww, m->wy + m->wh, bh, bh, 0, DefaultDepth(dpy, screen),
+                                    CopyFromParent, DefaultVisual(dpy, screen), CWOverrideRedirect | CWBackPixmap | CWEventMask, &wa);
       XDefineCursor(dpy, m->barwins[i], cursor[CurNormal]->cursor);
       XMapRaised(dpy, m->barwins[i]);
       XSetClassHint(dpy, m->barwins[i], &ch);
@@ -1717,8 +1717,7 @@ int xerror(Display *dpy, XErrorEvent *ee) {
   if (ee->error_code == BadWindow || (ee->request_code == X_SetInputFocus && ee->error_code == BadMatch) || (ee->request_code == X_PolyText8 && ee->error_code == BadDrawable) ||
       (ee->request_code == X_PolyFillRectangle && ee->error_code == BadDrawable) || (ee->request_code == X_PolySegment && ee->error_code == BadDrawable) ||
       (ee->request_code == X_ConfigureWindow && ee->error_code == BadMatch) || (ee->request_code == X_GrabButton && ee->error_code == BadAccess) ||
-      (ee->request_code == X_GrabKey && ee->error_code == BadAccess) || (ee->request_code == X_CopyArea && ee->error_code == BadDrawable))
-    return 0;
+      (ee->request_code == X_GrabKey && ee->error_code == BadAccess) || (ee->request_code == X_CopyArea && ee->error_code == BadDrawable)) return 0;
   fprintf(stderr, "dwm: fatal error: request code=%d, error code=%d\n", ee->request_code, ee->error_code);
   return xerrorxlib(dpy, ee); /* may call exit */
 }
