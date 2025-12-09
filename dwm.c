@@ -149,6 +149,7 @@ void buttonpress(XEvent *e) {
 			click = ClkLtSymbol;
 	}
 
+	/* TODO: rewrite the process logic of clicks on window title */
 	else if (ev->window == selmon->barwins[1]) {
 		click = ClkWinTitle;
 	}
@@ -470,6 +471,7 @@ void drawbar(Monitor *m) {
 	XMoveResizeWindow(dpy, m->barwins[0], m->wx, m->by, x, bh);
 	drw_map(drw, m->barwins[0], 0, 0, x, bh);
 
+	/* TODO: design overdrawn gracefully & process the case n == 0 */
 	s = lrpad / 2;
 	if ((w = m->ww - tw - x - margin) > bh) {
 		drw_setscheme(drw, scheme[SchemeNorm]);
@@ -1640,6 +1642,7 @@ void updatetitle(Client *c) {
 
 void updateicon(Client *c) {
 	freeicon(c);
+	/* TODO: add default icon when no icon is provided */
 	c->icon = geticonprop(c->win, &c->icw, &c->ich);
 }
 
