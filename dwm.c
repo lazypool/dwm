@@ -434,7 +434,7 @@ Monitor *dirtomon(int dir) {
 }
 
 void drawbar(Monitor *m) {
-	int x, w, tw = 0, s = 0, v;
+	int x, w, tw = 0, s = 0, v, n = 0;
 	int boxs = drw->fonts->h / 9;
 	int boxw = drw->fonts->h / 6 + 2;
 	int margin = drw->fonts->h * 8;
@@ -455,6 +455,7 @@ void drawbar(Monitor *m) {
 	for (c = m->clients; c; c = c->next) {
 		occ |= c->tags;
 		if (c->isurgent) urg |= c->tags;
+		if (ISVISIBLE(c)) ++n;
 	}
 	x = 0;
 	for (i = 0; i < LENGTH(tags); i++) {
@@ -469,14 +470,18 @@ void drawbar(Monitor *m) {
 	XMoveResizeWindow(dpy, m->barwins[0], m->wx, m->by, x, bh);
 	drw_map(drw, m->barwins[0], 0, 0, x, bh);
 
-	s = TEXTW(m->sel->name);
+	s = lrpad / 2;
 	if ((w = m->ww - tw - x - margin) > bh) {
-		if (m->sel) {
-			drw_setscheme(drw, scheme[SchemeNorm]);
-			v = m->sel->icon ? m->sel->icw + iconspacing : 0;
-			s = m->pvs = drw_text(drw, x, 0, MIN(s + v, w), bh, lrpad / 2 + v, m->sel->name, 0) - x;
-			if (m->sel->icon) drw_pic(drw, x + lrpad / 2, (bh - m->sel->ich) / 2, m->sel->icw, m->sel->ich, m->sel->icon);
-			if (m->sel->isfloating) drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
+		drw_setscheme(drw, scheme[SchemeNorm]);
+		drw_text(drw, x, 0, w, bh, lrpad / 2, "", 0); /* cover the original content, but its awful */
+		if (n > 0) {
+			for (c = m->clients; c; c = c->next) {
+				if (!ISVISIBLE(c)) continue;
+				v = c->icon ? c->icw + iconspacing : 0;
+				if (c->icon) drw_pic(drw, x + s, (bh - c->ich) / 2, c->icw, c->ich, c->icon);
+				s += v;
+			}
+			s = m->pvs = s - iconspacing + lrpad / 2;
 			XMoveResizeWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - s) / 2, m->by, s, bh);
 			drw_map(drw, m->barwins[1], x, 0, w, bh);
 		} else {
