@@ -13,7 +13,7 @@ ReflowComments: false
 
 IndentWidth: 2
 TabWidth: 2
-UseTab: Never
+UseTab: ForContinuationAndIndentation
 ContinuationIndentWidth: 0
 
 AlignAfterOpenBracket: Align
