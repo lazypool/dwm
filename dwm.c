@@ -1,9 +1,15 @@
+#include "dwm.h"
+
+#include <X11/X.h>
 #include <locale.h>
 #include <signal.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+
+#include "src/drw.h"
 
 #ifdef XINERAMA
 #include <X11/extensions/Xinerama.h>
@@ -1113,6 +1119,15 @@ void setclientstate(Client *c, long state) {
 	XChangeProperty(dpy, c->win, wmatom[WMState], wmatom[WMState], 32, PropModeReplace, (unsigned char *)data, 2);
 }
 
+void setdefaulticon(Client *c) {
+	c->icw = c->ich = iconsize;
+	uint32_t *data = (uint32_t *)calloc(iconsize * iconsize, sizeof(uint32_t));
+	if (!data) return;
+	for (int i = 0; i < iconsize * iconsize; ++i) data[i] = 0xFF808080;
+	c->icon = drw_picture_create_resized(drw, (char *)data, iconsize, iconsize, iconsize, iconsize);
+	free(data);
+}
+
 int sendevent(Client *c, Atom proto) {
 	int n;
 	Atom *protocols;
@@ -1642,8 +1657,8 @@ void updatetitle(Client *c) {
 
 void updateicon(Client *c) {
 	freeicon(c);
-	/* TODO: add default icon when no icon is provided */
 	c->icon = geticonprop(c->win, &c->icw, &c->ich);
+	if (!c->icon) setdefaulticon(c);
 }
 
 void updatewindowtype(Client *c) {

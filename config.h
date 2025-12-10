@@ -10,7 +10,7 @@ const unsigned int snap     = 32; /* snap pixel */
 const int showbar           = 1;  /* 0 means no bar */
 const int topbar            = 1;  /* 0 means bottom bar */
 const int sidepad           = 10; /* side padding size */
-const int iconsize          = 19; /* icon size */
+const int iconsize          = 24; /* icon size */
 const int iconspacing       = 8;  /* space between icon and title */
 const char *fonts[]         = {"Iosevka:style:medium:size=12" ,"JetBrainsMono Nerd Font Mono:style:medium:size=19" };
 const char dmenufont[]      = "JetBrainsMono Nerd Font Mono:size=12";
