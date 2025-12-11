@@ -27,7 +27,7 @@ LDFLAGS  = ${LIBS}
 CC = cc
 
 # object file
-SRC = dwm.c src/drw.c src/util.c
+SRC = dwm.c src/drw.c src/util.c src/icon.c
 OBJ = ${SRC:.c=.o}
 
 all: dwm

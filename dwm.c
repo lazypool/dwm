@@ -10,6 +10,8 @@
 #include <time.h>
 
 #include "src/drw.h"
+#include "src/icon.h"
+#include "src/util.h"
 
 #ifdef XINERAMA
 #include <X11/extensions/Xinerama.h>
@@ -1120,12 +1122,12 @@ void setclientstate(Client *c, long state) {
 }
 
 void setdefaulticon(Client *c) {
-	c->icw = c->ich = iconsize;
-	uint32_t *data = (uint32_t *)calloc(iconsize * iconsize, sizeof(uint32_t));
-	if (!data) return;
-	for (int i = 0; i < iconsize * iconsize; ++i) data[i] = 0xFF808080;
-	c->icon = drw_picture_create_resized(drw, (char *)data, iconsize, iconsize, iconsize, iconsize);
-	free(data);
+	uint32_t w, h, *data;
+
+	data = getdefaulticon(&w, &h);
+	c->icw = w <= h ? MAX(w * iconsize / h, 1) : iconsize;
+	c->ich = w <= h ? iconsize : MAX(h * iconsize / w, 1);
+	c->icon = drw_picture_create_resized(drw, (char *)data, w, h, c->icw, c->ich);
 }
 
 int sendevent(Client *c, Atom proto) {
