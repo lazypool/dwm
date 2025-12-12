@@ -1,6 +1,7 @@
 #include "dwm.h"
 
 #include <X11/X.h>
+#include <X11/Xlib.h>
 #include <locale.h>
 #include <signal.h>
 #include <stdint.h>
@@ -479,25 +480,22 @@ void drawbar(Monitor *m) {
 	XMoveResizeWindow(dpy, m->barwins[0], m->wx, m->by, x, bh);
 	drw_map(drw, m->barwins[0], 0, 0, x, bh);
 
-	/* TODO: design overdrawn gracefully & process the case n == 0 */
 	s = lrpad / 2;
 	if ((w = m->ww - tw - x - margin) > bh) {
 		drw_setscheme(drw, scheme[SchemeNorm]);
-		drw_text(drw, x, 0, w, bh, lrpad / 2, "", 0); /* cover the original content, but its awful */
+		drw_text(drw, x, 0, w, bh, lrpad / 2, "", 0);
 		if (n > 0) {
 			for (c = m->clients; c; c = c->next) {
 				if (!ISVISIBLE(c)) continue;
-				v = c->icon ? c->icw + iconspacing : 0;
 				if (c->icon) drw_pic(drw, x + s, (bh - c->ich) / 2, c->icw, c->ich, c->icon);
-				s += v;
+				s += c->icon ? c->icw + iconspacing : 0;
 			}
 			s = m->pvs = s - iconspacing + lrpad / 2;
 			XMoveResizeWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - s) / 2, m->by, s, bh);
 			drw_map(drw, m->barwins[1], x, 0, w, bh);
 		} else {
-			drw_text(drw, x, 0, w, bh, lrpad / 2, "", 0);
-			drw_map(drw, m->barwins[1], x, 0, w, bh);
-			XMoveResizeWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - bh) / 2, m->by, bh, bh);
+			s = m->pvs ? m->pvs : lrpad + iconspacing;
+			XMoveResizeWindow(dpy, m->barwins[1], m->wx + (m->ww - tw + x - s) / 2, -2 * bh, s, bh);
 		}
 	}
 }
