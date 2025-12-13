@@ -48,88 +48,88 @@ typedef struct Rule Rule;
 typedef struct Pertag Pertag;
 
 struct Arg {
-  int i;
-  unsigned int ui;
-  float f;
-  const void *v;
+	int i;
+	unsigned int ui;
+	float f;
+	const void *v;
 };
 
 struct Button {
-  unsigned int click;
-  unsigned int mask;
-  unsigned int button;
-  void (*func)(const Arg *arg);
-  const Arg arg;
+	unsigned int click;
+	unsigned int mask;
+	unsigned int button;
+	void (*func)(const Arg *arg);
+	const Arg arg;
 };
 
 struct Client {
-  char name[256];
-  float mina, maxa;
-  int x, y, w, h;
-  int oldx, oldy, oldw, oldh;
-  int basew, baseh, incw, inch, maxw, maxh, minw, minh, hintsvalid;
-  int bw, oldbw;
-  unsigned int tags;
-  int isfixed, isfloating, isglobal, isurgent, neverfocus, oldstate, isfullscreen;
-  unsigned int icw, ich;
-  Picture icon;
-  Client *next;
-  Client *snext;
-  Monitor *mon;
-  Window win;
+	char name[256];
+	float mina, maxa;
+	int x, y, w, h;
+	int oldx, oldy, oldw, oldh;
+	int basew, baseh, incw, inch, maxw, maxh, minw, minh, hintsvalid;
+	int bw, oldbw;
+	unsigned int tags;
+	int isfixed, isfloating, isglobal, isurgent, neverfocus, oldstate, isfullscreen;
+	unsigned int icw, ich;
+	Picture icon;
+	Client *next;
+	Client *snext;
+	Monitor *mon;
+	Window win;
 };
 
 struct Key {
-  unsigned int mod;
-  KeySym keysym;
-  void (*func)(const Arg *);
-  const Arg arg;
+	unsigned int mod;
+	KeySym keysym;
+	void (*func)(const Arg *);
+	const Arg arg;
 };
 
 struct Layout {
-  const char *symbol;
-  void (*arrange)(Monitor *);
+	const char *symbol;
+	void (*arrange)(Monitor *);
 };
 
 struct Monitor {
-  char ltsymbol[16];
-  float mfact;
-  int nmaster;
-  int num;
-  int by;             /* bar geometry */
-  int mx, my, mw, mh; /* screen size */
-  int wx, wy, ww, wh; /* window area  */
-  int pvx, pvs;       /* tags & title size */
-  unsigned int seltags;
-  unsigned int sellt;
-  unsigned int tagset[2];
-  int showbar;
-  int topbar;
-  Client *clients;
-  Client *sel;
-  Client *stack;
-  Monitor *next;
-  Window barwins[3];
-  const Layout *lt[2];
-  Pertag *pertag;
+	char ltsymbol[16];
+	float mfact;
+	int nmaster;
+	int num;
+	int by;             /* bar geometry */
+	int mx, my, mw, mh; /* screen size */
+	int wx, wy, ww, wh; /* window area  */
+	int pvx, pvs;       /* tags & title size */
+	unsigned int seltags;
+	unsigned int sellt;
+	unsigned int tagset[2];
+	int showbar;
+	int topbar;
+	Client *clients;
+	Client *sel;
+	Client *stack;
+	Monitor *next;
+	Window barwins[3];
+	const Layout *lt[2];
+	Pertag *pertag;
 };
 
 struct Rule {
-  const char *class;
-  const char *instance;
-  const char *title;
-  unsigned int tags;
-  int isfloating;
-  int isglobal;
-  int monitor;
-  int unmanaged;
+	const char *class;
+	const char *instance;
+	const char *title;
+	unsigned int tags;
+	int isfloating;
+	int isglobal;
+	int monitor;
+	int unmanaged;
 };
 
 struct Pertag {
-  unsigned int curtag;
-  int nmasters[MAXTAGS];
-  unsigned int sellts[MAXTAGS];
-  const Layout *ltidxs[MAXTAGS][2];
+	unsigned int curtag;
+	int nmasters[MAXTAGS];
+	unsigned int sellts[MAXTAGS];
+	const Layout *ltidxs[MAXTAGS][2];
 };
 
 void applyrules(Client *c);
@@ -242,20 +242,20 @@ int lrpad;     /* sum of left and right padding for text */
 int (*xerrorxlib)(Display *, XErrorEvent *);
 unsigned int numlockmask = 0;
 void (*handler[LASTEvent])(XEvent *) = {
-    [ButtonPress]      = buttonpress,
-    [ClientMessage]    = clientmessage,
-    [ConfigureRequest] = configurerequest,
-    [ConfigureNotify]  = configurenotify,
-    [DestroyNotify]    = destroynotify,
-    [EnterNotify]      = enternotify,
-    [Expose]           = expose,
-    [FocusIn]          = focusin,
-    [KeyPress]         = keypress,
-    [MappingNotify]    = mappingnotify,
-    [MapRequest]       = maprequest,
-    [MotionNotify]     = motionnotify,
-    [PropertyNotify]   = propertynotify,
-    [UnmapNotify]      = unmapnotify };
+	[ButtonPress]      = buttonpress,
+	[ClientMessage]    = clientmessage,
+	[ConfigureRequest] = configurerequest,
+	[ConfigureNotify]  = configurenotify,
+	[DestroyNotify]    = destroynotify,
+	[EnterNotify]      = enternotify,
+	[Expose]           = expose,
+	[FocusIn]          = focusin,
+	[KeyPress]         = keypress,
+	[MappingNotify]    = mappingnotify,
+	[MapRequest]       = maprequest,
+	[MotionNotify]     = motionnotify,
+	[PropertyNotify]   = propertynotify,
+	[UnmapNotify]      = unmapnotify };
 Atom wmatom[WMLast], netatom[NetLast];
 int running = 1;
 Cur *cursor[CurLast];
