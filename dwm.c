@@ -132,6 +132,12 @@ void attachstack(Client *c) {
 	c->mon->stack = c;
 }
 
+void autostart(void) {
+	char cmd[100];
+	sprintf(cmd, "%s &", autostartscript);
+	system(cmd);
+}
+
 void buttonpress(XEvent *e) {
 	unsigned int i, x, click, occ = 0;
 	Arg arg = {0};
@@ -1068,12 +1074,6 @@ void run(void) {
 		if (handler[ev.type]) handler[ev.type](&ev); /* call handler */
 }
 
-void runAutostart(void) {
-	char cmd[100];
-	sprintf(cmd, "%s &", autostartscript);
-	system(cmd);
-}
-
 void scan(void) {
 	unsigned int i, num;
 	Window d1, d2, *wins = NULL;
@@ -1769,7 +1769,7 @@ int main(int argc, char *argv[]) {
 	if (pledge("stdio rpath proc exec", NULL) == -1) die("pledge");
 #endif /* __OpenBSD__ */
 	scan();
-	runAutostart();
+	autostart();
 	run();
 	cleanup();
 	XCloseDisplay(dpy);

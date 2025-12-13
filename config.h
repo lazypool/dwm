@@ -29,7 +29,7 @@ const char *colors[][3]     = {
 
 /* self-defined scripts */
 const char *autostartscript = "$DWM/autostart.sh";
-const char *statusbarscript = "$DWM/scripts/statusbar.sh";
+const char *statusbarscript = "$DWM/statusbar.sh";
 
 /* tags */
 const char *tags[MAXTAGS] = {"", "", "", "", "", "", "", ""};
