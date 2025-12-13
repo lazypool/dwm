@@ -234,6 +234,12 @@ void zoom(const Arg *arg);
 
 const char broken[] = "broken";
 char stext[256];
+char *btnstr[6] = {
+	[Button1] = "L",  /* left mouse button */
+	[Button2] = "M",  /* middle mouse button */
+	[Button3] = "R",  /* right mouse button */
+	[Button4] = "U",  /* mouse wheel up */
+	[Button5] = "D"}; /* mouse wheel down */
 int screen;
 int sw, sh;    /* X display screen geometry width, height */
 int bh;        /* bar height */
@@ -255,7 +261,7 @@ void (*handler[LASTEvent])(XEvent *) = {
 	[MapRequest]       = maprequest,
 	[MotionNotify]     = motionnotify,
 	[PropertyNotify]   = propertynotify,
-	[UnmapNotify]      = unmapnotify };
+	[UnmapNotify]      = unmapnotify};
 Atom wmatom[WMLast], netatom[NetLast];
 int running = 1;
 Cur *cursor[CurLast];

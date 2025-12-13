@@ -246,7 +246,7 @@ void clkstatusbar(const Arg *arg) {
 	struct timespec now;
 	unsigned long current;
 	int n = 0, ptr = 0, len;
-	char *text, *btn = "L", *cmd;
+	char *text, *btn = btnstr[arg->ui], *cmd;
 
 	if (!arg->i || arg->i <= 0) return;
 
@@ -266,24 +266,6 @@ void clkstatusbar(const Arg *arg) {
 		len = TEXTW(text) - lrpad;
 		text[ptr] = ' ';
 		n += (len < arg->i);
-	}
-
-	switch (arg->ui) {
-		case Button1:
-			btn = "L";
-			break;
-		case Button2:
-			btn = "M";
-			break;
-		case Button3:
-			btn = "R";
-			break;
-		case Button4:
-			btn = "U";
-			break;
-		case Button5:
-			btn = "D";
-			break;
 	}
 
 	cmd = (char *)malloc(256 * sizeof(char));
