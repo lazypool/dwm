@@ -9,9 +9,11 @@ const unsigned int borderpx = 3;  /* border pixel of windows */
 const unsigned int snap     = 32; /* snap pixel */
 const int showbar           = 1;  /* 0 means no bar */
 const int topbar            = 1;  /* 0 means bottom bar */
-const int sidepad           = 10; /* side padding size */
+const int sidepad           = 6;  /* side padding size */
 const int iconsize          = 24; /* icon size */
 const int iconspacing       = 8;  /* space between icon and title */
+const int ulpad             = 5;  /* horizontal padding between underline and tag */
+const int ulstroke          = 3;  /* thickness of the underline */
 const char *fonts[]         = {"Iosevka:style:medium:size=12" ,"JetBrainsMono Nerd Font Mono:style:medium:size=19" };
 const char dmenufont[]      = "JetBrainsMono Nerd Font Mono:size=12";
 const char col_gray1[]      = "#222222";

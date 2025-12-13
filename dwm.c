@@ -432,9 +432,7 @@ Monitor *dirtomon(int dir) {
 }
 
 void drawbar(Monitor *m) {
-	int x, w, tw = 0, s = 0, v, n = 0;
-	int boxs = drw->fonts->h / 9;
-	int boxw = drw->fonts->h / 6 + 2;
+	int x, w, tw = 0, s = 0, n = 0;
 	int margin = drw->fonts->h * 8;
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
@@ -458,8 +456,9 @@ void drawbar(Monitor *m) {
 	x = 0;
 	for (i = 0; i < LENGTH(tags); i++) {
 		w = TEXTW(tags[i]);
-		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
+		drw_setscheme(drw, scheme[occ & 1 << i ? SchemeSel : SchemeNorm]);
 		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
+		if (m->tagset[m->seltags] & 1 << i) drw_rect(drw, x + ulpad, bh - ulstroke, w - 2 * ulpad, ulstroke, 1, 0);
 		x += w;
 	}
 	w = TEXTW(m->ltsymbol);
@@ -476,6 +475,7 @@ void drawbar(Monitor *m) {
 			for (c = m->clients; c; c = c->next) {
 				if (!ISVISIBLE(c)) continue;
 				if (c->icon) drw_pic(drw, x + s, (bh - c->ich) / 2, c->icw, c->ich, c->icon);
+				if (m->sel == c) drw_rect(drw, x + s, bh - ulstroke, c->icw, ulstroke, 1, 0);
 				s += c->icon ? c->icw + iconspacing : 0;
 			}
 			s = m->pvs = s - iconspacing + lrpad / 2;
