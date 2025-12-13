@@ -133,7 +133,7 @@ void attachstack(Client *c) {
 }
 
 void buttonpress(XEvent *e) {
-	unsigned int i, x, click;
+	unsigned int i, x, click, occ = 0;
 	Arg arg = {0};
 	Client *c;
 	Monitor *m;
@@ -149,8 +149,11 @@ void buttonpress(XEvent *e) {
 
 	if (ev->window == selmon->barwins[0]) {
 		i = x = 0;
-		do x += TEXTW(tags[i]);
-		while (ev->x >= x && ++i < LENGTH(tags));
+		for (c = m->clients; c; c = c->next) occ |= c->tags == TAGMASK ? 0 : c->tags;
+		do {
+			if (i >= MINTAGS && !(occ & 1 << i || m->tagset[m->seltags] & 1 << i)) continue;
+			x += TEXTW(tags[i]);
+		} while (ev->x >= x && ++i < LENGTH(tags));
 		if (i < LENGTH(tags)) {
 			click = ClkTagBar;
 			arg.ui = 1 << i;
@@ -449,12 +452,13 @@ void drawbar(Monitor *m) {
 	}
 
 	for (c = m->clients; c; c = c->next) {
-		occ |= c->tags;
+		occ |= c->tags == TAGMASK ? 0 : c->tags;
 		if (c->isurgent) urg |= c->tags;
 		if (ISVISIBLE(c)) ++n;
 	}
 	x = 0;
 	for (i = 0; i < LENGTH(tags); i++) {
+		if (i >= MINTAGS && !(occ & 1 << i || m->tagset[m->seltags] & 1 << i)) continue;
 		w = TEXTW(tags[i]);
 		drw_setscheme(drw, scheme[occ & 1 << i ? SchemeSel : SchemeNorm]);
 		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);

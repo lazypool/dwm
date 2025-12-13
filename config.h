@@ -32,7 +32,7 @@ const char *autostartscript = "$DWM/autostart.sh";
 const char *statusbarscript = "$DWM/scripts/statusbar.sh";
 
 /* tags */
-const char *tags[] = {"", "", "", "", "", "", "", ""};
+const char *tags[MAXTAGS] = {"", "", "", "", "", "", "", ""};
 
 /* rule */
 const Rule rules[] = {
@@ -68,11 +68,11 @@ const char *termcmd[]  = {"st", NULL};
 
 /* key definitions */
 #define MODKEY Mod4Mask
-#define TAGKEYS(KEY, TAG)                                    \
-	{MODKEY, KEY, view, {.ui = 1 << TAG}},                     \
-	{MODKEY | ControlMask, KEY, toggleview, {.ui = 1 << TAG}}, \
-	{MODKEY | ShiftMask, KEY, viewontag, {.ui = 1 << TAG}},    \
-	{MODKEY | ControlMask | ShiftMask, KEY, tag, {.ui = 1 << TAG}},
+#define TAGKEYS(KEY, MSK)                               \
+	{MODKEY, KEY, view, {.ui = MSK}},                     \
+	{MODKEY | ControlMask, KEY, toggleview, {.ui = MSK}}, \
+	{MODKEY | ShiftMask, KEY, viewontag, {.ui = MSK}},    \
+	{MODKEY | ControlMask | ShiftMask, KEY, tag, {.ui = MSK}},
 
 const Key keys[] = {
 	/* modifier          key        function        argument */
@@ -99,8 +99,9 @@ const Key keys[] = {
 	{MODKEY | ShiftMask, XK_comma,  tagmon,         {.i = -1}         },
 	{MODKEY | ShiftMask, XK_period, tagmon,         {.i = +1}         },
 	{MODKEY | ShiftMask, XK_q,      quit,           {0}               },
-	TAGKEYS(XK_1, 0) TAGKEYS(XK_2, 1) TAGKEYS(XK_3, 2) TAGKEYS(XK_4, 3)
-	TAGKEYS(XK_5, 4) TAGKEYS(XK_6, 5) TAGKEYS(XK_7, 6) TAGKEYS(XK_8, 7)
+	TAGKEYS(XK_1, TAG(0)) TAGKEYS(XK_2, TAG(1)) TAGKEYS(XK_3, TAG(2))
+	TAGKEYS(XK_4, TAG(3)) TAGKEYS(XK_5, TAG(4)) TAGKEYS(XK_6, TAG(5))
+	TAGKEYS(XK_7, TAG(6)) TAGKEYS(XK_8, TAG(7)) TAGKEYS(XK_9, TAGHIDE)
 };
 
 /* button definitions */

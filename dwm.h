@@ -20,6 +20,9 @@
 #include "src/drw.h"
 #include "src/util.h"
 
+#define MAXTAGS 8
+#define MINTAGS 5
+
 #define BUTTONMASK               (ButtonPressMask | ButtonReleaseMask)
 #define CLEANMASK(mask)          (mask & ~(numlockmask | LockMask) & (ShiftMask | ControlMask | Mod1Mask | Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask))
 #define INTERSECT(x, y, w, h, m) (MAX(0, MIN((x) + (w), (m)->wx + (m)->ww) - MAX((x), (m)->wx)) * MAX(0, MIN((y) + (h), (m)->wy + (m)->wh) - MAX((y), (m)->wy)))
@@ -30,7 +33,8 @@
 #define HEIGHT(X)                ((X)->h + 2 * (X)->bw)
 #define TAGMASK                  ((1 << MAXTAGS) - 1)
 #define TEXTW(X)                 (drw_fontset_getwidth(drw, (X)) + lrpad)
-#define MAXTAGS                  (1 << 3)
+#define TAG(x)                   ((1 << (x)))
+#define TAGHIDE                  ((TAG(5) | TAG(6) | TAG(7)))
 
 enum { CurNormal, CurResize, CurMove, CurLast };
 enum { SchemeNorm, SchemeSel };
