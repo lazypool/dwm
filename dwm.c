@@ -158,9 +158,15 @@ void buttonpress(XEvent *e) {
 			click = ClkLtSymbol;
 	}
 
-	/* TODO: rewrite the process logic of clicks on window title */
 	else if (ev->window == selmon->barwins[1]) {
+		x = lrpad / 2 - iconspacing / 2;
+		for (c = m->clients; c; c = c->next) {
+			if (!ISVISIBLE(c)) continue;
+			if (ev->x < x + iconsize) break;
+			x += iconsize + iconspacing;
+		}
 		click = ClkWinTitle;
+		arg.v = c;
 	}
 
 	else if (ev->window == selmon->barwins[2]) {
@@ -1739,7 +1745,7 @@ int xerrorstart(Display *dpy, XErrorEvent *ee) {
 }
 
 void zoom(const Arg *arg) {
-	Client *c = selmon->sel;
+	Client *c = arg->v ? (Client *)arg->v : selmon->sel;
 
 	if (!selmon->lt[selmon->sellt]->arrange || !c || c->isfloating) return;
 	if (c == nexttiled(selmon->clients) && !(c = nexttiled(c->next))) return;
