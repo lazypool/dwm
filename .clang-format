@@ -13,14 +13,14 @@ ReflowComments: false
 
 IndentWidth: 2
 TabWidth: 2
-UseTab: Never
-ContinuationIndentWidth: 0
+UseTab: ForContinuationAndIndentation
+ContinuationIndentWidth: 2
 
 AlignAfterOpenBracket: Align
 AlignArrayOfStructures: Left
 BreakBeforeBraces: Attach
 
-ColumnLimit: 180
+ColumnLimit: 0
 MaxEmptyLinesToKeep: 2
 
 AllowShortFunctionsOnASingleLine: false
