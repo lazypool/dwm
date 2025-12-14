@@ -100,5 +100,5 @@ picom --config "$DWM"/picom.conf >>/dev/null 2>&1 &
 feh --randomize --bg-fill "$DWM"/wallpaper.jpg
 updates=$(pkgupdates)
 while true; do
-	sleep 1 && xsetroot -name "$updates $(battery) $(brightness) $(cpu) $(mem) $(wlan) $(clock) $(vol)"
+	sleep 1 && xsetroot -name "$updates&$(battery)&$(brightness)&$(cpu)&$(mem)&$(wlan)&$(clock)&$(vol)"
 done

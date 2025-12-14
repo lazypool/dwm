@@ -261,6 +261,7 @@ void clkstatusbar(const Arg *arg) {
 	struct timespec now;
 	unsigned long current;
 	int n = 0, ptr = 0, len;
+	int i, j, isc = 0;
 	char *text, *btn = btnstr[arg->ui], *cmd;
 
 	if (!arg->i || arg->i <= 0) return;
@@ -274,9 +275,17 @@ void clkstatusbar(const Arg *arg) {
 		last = current;
 
 	text = (char *)malloc(256 * sizeof(char));
-	strcpy(text, stext);
+	for (i = j = 0; stext[i]; ++i) {
+		if (stext[i] == '^') {
+			isc ^= 1;
+			continue;
+		}
+		if (!isc) text[j++] = stext[i];
+	}
+	text[j] = '\0';
+
 	while (text[++ptr]) {
-		if (text[ptr] != ' ') continue;
+		if (text[ptr] != '&') continue;
 		text[ptr] = '\0';
 		len = TEXTW(text) - lrpad;
 		text[ptr] = ' ';
@@ -515,6 +524,8 @@ int drawstatusbar(Monitor *m) {
 	memcpy(text, stext, len);
 
 	for (i = w = 0; text[i]; i++) {
+		if (text[i] == '&')
+			text[i] = ' ';
 		if (text[i] == '^') {
 			if (!isc) {
 				isc = 1;
