@@ -159,6 +159,7 @@ void detachstack(Client *c);
 Monitor *dirtomon(int dir);
 void drawbar(Monitor *m);
 void drawbars(void);
+int drawstatusbar(Monitor *m);
 void enternotify(XEvent *e);
 void expose(XEvent *e);
 void focus(Client *c);
@@ -237,7 +238,7 @@ int xerrorstart(Display *dpy, XErrorEvent *ee);
 void zoom(const Arg *arg);
 
 const char broken[] = "broken";
-char stext[256];
+char stext[1024];
 char *btnstr[6] = {
 	[Button1] = "L",  /* left mouse button */
 	[Button2] = "M",  /* middle mouse button */

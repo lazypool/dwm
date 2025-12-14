@@ -218,7 +218,7 @@ void cleanup(void) {
 	XUngrabKey(dpy, AnyKey, AnyModifier, root);
 	while (mons) cleanupmon(mons);
 	for (i = 0; i < CurLast; i++) drw_cur_free(drw, cursor[i]);
-	for (i = 0; i < LENGTH(colors); i++) free(scheme[i]);
+	for (i = 0; i < LENGTH(colors) + 1; i++) free(scheme[i]);
 	free(scheme);
 	XDestroyWindow(dpy, wmcheckwin);
 	drw_free(drw);
@@ -450,9 +450,7 @@ void drawbar(Monitor *m) {
 
 	/* draw status first so it can be overdrawn by tags later */
 	if (m == selmon) { /* status is only drawn on selected monitor */
-		drw_setscheme(drw, scheme[SchemeNorm]);
-		tw = TEXTW(stext) - lrpad + 2; /* 2px right padding */
-		drw_text(drw, m->ww - tw, 0, tw, bh, 0, stext, 0);
+		tw = m->ww - drawstatusbar(m);
 		XMoveResizeWindow(dpy, m->barwins[2], m->wx + m->ww - tw, m->by, tw, bh);
 		drw_map(drw, m->barwins[2], m->ww - tw, 0, m->ww, bh);
 	}
@@ -502,6 +500,89 @@ void drawbars(void) {
 	Monitor *m;
 
 	for (m = mons; m; m = m->next) drawbar(m);
+}
+
+int drawstatusbar(Monitor *m) {
+	int i, w, x, n, len, ret;
+	int rx, ry, rw, rh;
+	short isc = 0;
+	char *text, *p, buf[8];
+
+	len = strlen(stext) + 1;
+	text = ecalloc(len, sizeof(char));
+	p = text;
+	memcpy(text, stext, len);
+
+	for (i = w = 0; text[i]; i++) {
+		if (text[i] == '^') {
+			if (!isc) {
+				isc = 1;
+				text[i] = '\0';
+				w += TEXTW(text) - lrpad;
+				text[i] = '^';
+				if (text[++i] == 'f') w += atoi(text + ++i);
+			} else {
+				isc = 0;
+				text = text + i + 1;
+				i = -1;
+			}
+		}
+	}
+
+	if (!isc) w += TEXTW(text) - lrpad;
+	else isc = 0;
+	text = p;
+	w += 2; /* 1px padding on both sides */
+	ret = x = m->ww - w;
+
+	drw_setscheme(drw, scheme[LENGTH(colors)]);
+	drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
+	drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
+	drw_rect(drw, x++, 0, w, bh, 1, 1);
+
+	for (i = 0; text[i]; i++) {
+		if (text[i] == '^' && !isc) {
+			isc = 1;
+			text[i] = '\0';
+			w = TEXTW(text) - lrpad;
+			drw_text(drw, x, 0, w, bh, 0, text, 0);
+			x += w;
+
+			/* process code part */
+			while (text[++i] != '^') {
+				if (text[i] == 'c' || text[i] == 'b') {
+					memcpy(buf, text + i + 1, 7);
+					buf[7] = '\0';
+					drw_clr_create(drw, &drw->scheme[text[i] == 'c' ? ColFg : ColBg], buf);
+					i += 7;
+				} else if (text[i] == 'd') {
+					drw->scheme[ColFg] = scheme[SchemeNorm][ColFg];
+					drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
+				} else if (text[i] == 'r') {
+					sscanf(text + i, "r%d,%d,%d,%d%n", &rx, &ry, &rw, &rh, &n);
+					drw_rect(drw, x + rx, ry, rw, rh, 1, 0);
+					i += n - 1;
+				} else if (text[i] == 'f') {
+					sscanf(text + i, "f%d%n", &rx, &n);
+					x += rx;
+					i += n - 1;
+				}
+			}
+
+			text = text + i + 1;
+			i=-1;
+			isc = 0;
+		}
+	}
+
+	if (!isc) {
+		w = TEXTW(text) - lrpad;
+		drw_text(drw, x, 0, w, bh, 0, text, 0);
+	}
+
+	drw_setscheme(drw, scheme[SchemeNorm]);
+	free(p);
+	return ret;
 }
 
 void enternotify(XEvent *e) {
@@ -1242,7 +1323,8 @@ void setup(void) {
 	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
 	cursor[CurMove] = drw_cur_create(drw, XC_fleur);
 	/* init appearance */
-	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
+	scheme = ecalloc(LENGTH(colors) + 1, sizeof(Clr *));
+	scheme[LENGTH(colors)] = drw_scm_create(drw, colors[0], 3);
 	for (i = 0; i < LENGTH(colors); i++) scheme[i] = drw_scm_create(drw, colors[i], 3);
 	/* init bars */
 	updatebars();
