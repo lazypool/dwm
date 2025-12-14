@@ -78,11 +78,10 @@ pkgupdates() {
 }
 
 vol() {
-	val=$(amixer get Master | grep -o '\[off\]' | head -1)
-	if [ -z "$val" ]; then
-		printf '^b%s^^c%s^  󰕾   ^d^' "$blk" "$grn"
-	else
+	if amixer get Master | grep -q -E '\[off\]|\[0%\]'; then
 		printf '^b%s^^c%s^  󰝟   ^d^' "$blk" "$red"
+	else
+		printf '^b%s^^c%s^  󰕾   ^d^' "$blk" "$grn"
 	fi
 }
 
