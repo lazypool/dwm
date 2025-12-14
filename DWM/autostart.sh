@@ -68,6 +68,7 @@ fcitx5 &
 dunst -conf "$DWM"/dunst.conf &
 picom --config "$DWM"/picom.conf >>/dev/null 2>&1 &
 feh --randomize --bg-fill "$DWM"/wallpaper.jpg
+xsetroot -name "$(cat "$DWM"/template.txt)" # pre-render to avoid initial delay
 updates=$(pkgupdates)
 while true; do
 	sleep 1 && xsetroot -name "$updates&$(battery)&$(brightness)&$(cpu)&$(mem)&$(wlan)&$(clock)&$(vol)"
