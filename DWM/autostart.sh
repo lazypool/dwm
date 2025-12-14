@@ -8,39 +8,10 @@ blu='#7aa2f7'
 red='#d47d85'
 dbl='#668ee3'
 
-batteryicons() {
-	if acpi | grep -q 'Discharging'; then
-		case "$1" in
-		100) echo '󰠇' ;;
-		9[0-9]) echo '󰠐' ;;
-		8[0-9]) echo '󰠏' ;;
-		7[0-9]) echo '󰠎' ;;
-		6[0-9]) echo '󰠍' ;;
-		5[0-9]) echo '󰠌' ;;
-		4[0-9]) echo '󰠋' ;;
-		3[0-9]) echo '󰠊' ;;
-		2[0-9]) echo '󰠉' ;;
-		*) echo '󰠈' ;;
-		esac
-	else
-		case "$1" in
-		100) echo '󰂅' ;;
-		9[0-9]) echo '󰂋' ;;
-		8[0-9]) echo '󰂊' ;;
-		7[0-9]) echo '󰢞' ;;
-		6[0-9]) echo '󰂉' ;;
-		5[0-9]) echo '󰢝' ;;
-		4[0-9]) echo '󰂈' ;;
-		3[0-9]) echo '󰂇' ;;
-		2[0-9]) echo '󰂆' ;;
-		*) echo '󰢜' ;;
-		esac
-	fi
-}
-
 battery() {
+	bats='󰠈󰠉󰠊󰠋󰠌󰠍󰠎󰠏󰠐󰠇󰠇󰢜󰂆󰂇󰂈󰢝󰂉󰢞󰂊󰂋󰂅󰂅'
 	val=$(acpi | sed -n 's/.* \([0-9]\+\)%.*/\1/p' | head -1)
-	icon=$(batteryicons "$val")
+	icon=${bats:$(("$val" / 10 + $(acpi | grep -q 'Discharging' && echo '0' || echo '11'))):1}
 	printf '^b%s^^c%s^ %s ^d^' "$blk" "$blu" "$icon"
 	printf '^b%s^^c%s^ %s ^d^' "$blk" "$blu" "$val"
 }
