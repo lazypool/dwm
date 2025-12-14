@@ -505,6 +505,7 @@ void drawbars(void) {
 int drawstatusbar(Monitor *m) {
 	int i, w, x, n, len, ret;
 	int rx, ry, rw, rh;
+	int y = 5, v = 10; /* 5px padding on top and bottom */
 	short isc = 0;
 	char *text, *p, buf[8];
 
@@ -545,7 +546,7 @@ int drawstatusbar(Monitor *m) {
 			isc = 1;
 			text[i] = '\0';
 			w = TEXTW(text) - lrpad;
-			drw_text(drw, x, 0, w, bh, 0, text, 0);
+			drw_text(drw, x, y, w, bh - v, 0, text, 0);
 			x += w;
 
 			/* process code part */
@@ -560,7 +561,7 @@ int drawstatusbar(Monitor *m) {
 					drw->scheme[ColBg] = scheme[SchemeNorm][ColBg];
 				} else if (text[i] == 'r') {
 					sscanf(text + i, "r%d,%d,%d,%d%n", &rx, &ry, &rw, &rh, &n);
-					drw_rect(drw, x + rx, ry, rw, rh, 1, 0);
+					drw_rect(drw, x + rx, y + ry, rw, MIN(rh, bh - v), 1, 0);
 					i += n - 1;
 				} else if (text[i] == 'f') {
 					sscanf(text + i, "f%d%n", &rx, &n);
