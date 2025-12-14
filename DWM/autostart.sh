@@ -10,50 +10,50 @@ dbl='#668ee3'
 
 battery() {
 	val=$(acpi | sed -n 's/.* \([0-9]\+\)%.*/\1/p' | head -1)
-	printf '^c%s^ ^b%s^ BAT' "$blk" "$red"
-	printf '^c%s^ ^b%s^ %s ^b%s^' "$wht" "$gry" "$val" "$blk"
+	printf '^b%s^^c%s^ 󰂆 ^d^' "$blk" "$blu"
+	printf '^b%s^^c%s^ %s ^d^' "$blk" "$blu" "$val"
 }
 
 brightness() {
 	val=$(brightnessctl | sed -n 's/.*(\([0-9]\+\)%).*/\1/p')
-	printf '^c%s^   ' "$red"
-	printf '^c%s^ %.0f' "$red" "$val"
+	printf '^b%s^^c%s^  ^d^' "$blk" "$red"
+	printf '^b%s^^c%s^ %.0f ^d^' "$blk" "$red" "$val"
 }
 
 clock() {
-	printf '^c%s^ ^b%s^ 󱑆 ' "$blk" "$red"
-	printf '^c%s^ ^b%s^ %s ^b%s^' "$wht" "$gry" "$(date '+%H:%M')" "$blk"
+	printf '^b%s^^c%s^  󱑆  ^d^' "$dbl" "$blk"
+	printf '^b%s^^c%s^ %s ^d^' "$blu" "$blk" "$(date '+%a,  %H:%M  %p') "
 }
 
 cpu() {
 	val=$(grep -o "^[^ ]*" /proc/loadavg)
-	printf '^c%s^ ^b%s^ CPU' "$blk" "$grn"
-	printf '^c%s^ ^b%s^ %s ^b%s^' "$wht" "$gry" "$val" "$blk"
+	printf '^b%s^^c%s^ CPU ^d^' "$grn" "$blk"
+	printf '^b%s^^c%s^ %s ^d^' "$gry" "$wht" "$val"
 }
 
 mem() {
 	val=$(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)
-	printf '^c%s^ ^b%s^  ' "$red" "$blk"
-	printf '^c%s^ %s' "$red" "$val"
+	printf '^b%s^^c%s^  ^d^' "$blk" "$blu"
+	printf '^b%s^^c%s^ %s ^d^' "$blk" "$blu" "$val"
 }
 
 pkgupdates() {
 	updates=$({ timeout 20 checkupdates 2>/dev/null || true; } | wc -l)
-	if [ -z "$updates" ]; then
-		printf '  ^c%s^    Fully Updated' "$grn"
+	if [ "$updates" -eq 0 ]; then
+		printf '^b%s^^c%s^      Fully Updated   ^d^' "$blk" "$grn"
 	else
-		printf '  ^c%s^    %s updates' "$wht" "$updates"
+		printf '^b%s^^c%s^      %s updates   ^d^' "$blk" "$wht" "$updates"
 	fi
 }
 
 vol() {
-	printf ''
+	printf '^b%s^^c%s^     ^d^' "$blk" "$red"
 }
 
 wlan() {
 	case "$(cat /sys/class/net/wl*/operstate 2>/dev/null)" in
-	up) printf '^c%s^ ^b%s^ 󰤨 ^d^ ^c%s^Connected' "$blk" "$blu" "$blu" ;;
-	down) printf '^c%s^ ^b%s^ 󰤭 ^d^ ^c%s^Disconnected' "$blk" "$blu" "$blu" ;;
+	up) printf '^b%s^^c%s^  󰤨  ^b%s^^c%s^ Connected ^d^' "$blu" "$blk" "$gry" "$wht";;
+	down) printf '^b%s^^c%s^  󰤭  ^b%s^^c%s^ Disconnected ^d^' "$blu" "$blk" "$gry" "$wht";;
 	esac
 }
 
@@ -64,5 +64,5 @@ picom --config "$DWM"/picom.conf >>/dev/null 2>&1 &
 feh --randomize --bg-fill "$DWM"/wallpaper.jpg
 updates=$(pkgupdates)
 while true; do
-	sleep 1 && xsetroot -name "$updates $(cpu) $(battery) $(mem) $(wlan) $(clock)"
+	sleep 1 && xsetroot -name "$updates $(battery) $(brightness) $(cpu) $(mem) $(wlan) $(clock) $(vol)"
 done
