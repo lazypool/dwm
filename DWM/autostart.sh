@@ -8,9 +8,40 @@ blu='#7aa2f7'
 red='#d47d85'
 dbl='#668ee3'
 
+batteryicons() {
+	if acpi | grep -q 'Discharging'; then
+		case "$1" in
+		100) echo '󰠇' ;;
+		9[0-9]) echo '󰠐' ;;
+		8[0-9]) echo '󰠏' ;;
+		7[0-9]) echo '󰠎' ;;
+		6[0-9]) echo '󰠍' ;;
+		5[0-9]) echo '󰠌' ;;
+		4[0-9]) echo '󰠋' ;;
+		3[0-9]) echo '󰠊' ;;
+		2[0-9]) echo '󰠉' ;;
+		*) echo '󰠈' ;;
+		esac
+	else
+		case "$1" in
+		100) echo '󰂅' ;;
+		9[0-9]) echo '󰂋' ;;
+		8[0-9]) echo '󰂊' ;;
+		7[0-9]) echo '󰢞' ;;
+		6[0-9]) echo '󰂉' ;;
+		5[0-9]) echo '󰢝' ;;
+		4[0-9]) echo '󰂈' ;;
+		3[0-9]) echo '󰂇' ;;
+		2[0-9]) echo '󰂆' ;;
+		*) echo '󰢜' ;;
+		esac
+	fi
+}
+
 battery() {
 	val=$(acpi | sed -n 's/.* \([0-9]\+\)%.*/\1/p' | head -1)
-	printf '^b%s^^c%s^ 󰂆 ^d^' "$blk" "$blu"
+	icon=$(batteryicons "$val")
+	printf '^b%s^^c%s^ %s ^d^' "$blk" "$blu" "$icon"
 	printf '^b%s^^c%s^ %s ^d^' "$blk" "$blu" "$val"
 }
 
@@ -21,7 +52,7 @@ brightness() {
 }
 
 clock() {
-	printf '^b%s^^c%s^  󱑆  ^d^' "$dbl" "$blk"
+	printf '^b%s^^c%s^  󰥔  ^d^' "$dbl" "$blk"
 	printf '^b%s^^c%s^ %s ^d^' "$blu" "$blk" "$(date '+%a,  %H:%M  %p') "
 }
 
@@ -38,22 +69,27 @@ mem() {
 }
 
 pkgupdates() {
-	updates=$({ timeout 20 checkupdates 2>/dev/null || true; } | wc -l)
-	if [ "$updates" -eq 0 ]; then
-		printf '^b%s^^c%s^      Fully Updated   ^d^' "$blk" "$grn"
+	val=$({ timeout 20 checkupdates 2>/dev/null || true; } | wc -l)
+	if [ "$val" -eq 0 ]; then
+		printf '^b%s^^c%s^   󰬬   Fully Updated   ^d^' "$blk" "$grn"
 	else
-		printf '^b%s^^c%s^      %s updates   ^d^' "$blk" "$wht" "$updates"
+		printf '^b%s^^c%s^   󰬬   %s updates   ^d^' "$blk" "$wht" "$val"
 	fi
 }
 
 vol() {
-	printf '^b%s^^c%s^     ^d^' "$blk" "$red"
+	val=$(amixer get Master | grep -o '\[off\]' | head -1)
+	if [ -z "$val" ]; then
+		printf '^b%s^^c%s^  󰕾   ^d^' "$blk" "$grn"
+	else
+		printf '^b%s^^c%s^  󰝟   ^d^' "$blk" "$red"
+	fi
 }
 
 wlan() {
 	case "$(cat /sys/class/net/wl*/operstate 2>/dev/null)" in
-	up) printf '^b%s^^c%s^  󰤨  ^b%s^^c%s^ Connected ^d^' "$blu" "$blk" "$gry" "$wht";;
-	down) printf '^b%s^^c%s^  󰤭  ^b%s^^c%s^ Disconnected ^d^' "$blu" "$blk" "$gry" "$wht";;
+	up) printf '^b%s^^c%s^  󰖩  ^b%s^^c%s^ Connected ^d^' "$red" "$blk" "$gry" "$wht" ;;
+	down) printf '^b%s^^c%s^  󰖪  ^b%s^^c%s^ Disconnected ^d^' "$red" "$blk" "$gry" "$wht" ;;
 	esac
 }
 
