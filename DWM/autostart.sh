@@ -1,12 +1,11 @@
 #!/bin/bash
 
-blk='#1e222a'
-grn='#7eca9c'
-wht='#abb2bf'
-gry='#282c34'
-blu='#7aa2f7'
-red='#d47d85'
-dbl='#668ee3'
+theme=onedark
+
+# shellcheck source=themes/onedark/bar.txt
+source "$DWM/themes/$theme/bar.txt"
+tmpfile="$DWM/dwm-statusbar-placeholder.tmp"
+[ ! -f "$tmpfile" ] && touch "$tmpfile"
 
 battery() {
 	bats='󰠈󰠉󰠊󰠋󰠌󰠍󰠎󰠏󰠐󰠇󰠇󰢜󰂆󰂇󰂈󰢝󰂉󰢞󰂊󰂋󰂅󰂅'
@@ -65,11 +64,12 @@ wlan() {
 
 setxkbmap -layout us -variant colemak -option -option caps:swapescape -option lv3:ralt_alt
 fcitx5 &
-dunst -conf "$DWM"/dunst.conf &
-picom --config "$DWM"/picom.conf >>/dev/null 2>&1 &
-feh --randomize --bg-fill "$DWM"/wallpaper.jpg
-xsetroot -name "$(cat "$DWM"/template.txt)" # pre-render to avoid initial delay
+cat "$DWM/dunst.conf" "$DWM/themes/$theme/dunstrc" >"$DWM/dunstrc.tmp" # RESET
+dunst -conf "$DWM/dunstrc.tmp" >>/dev/null 2>&1 &
+picom --config "$DWM/picom.conf" >>/dev/null 2>&1 & # RESET
+xsetroot -name "$(cat "$tmpfile")" # pre-render to avoid initial delay
 updates=$(pkgupdates)
 while true; do
-	sleep 1 && xsetroot -name "$updates&$(battery)&$(brightness)&$(cpu)&$(mem)&$(wlan)&$(clock)&$(vol)"
+	echo "$updates&$(battery)&$(brightness)&$(cpu)&$(mem)&$(wlan)&$(clock)&$(vol)" >"$tmpfile"
+	xsetroot -name "$(cat "$tmpfile")" && sleep 60
 done
