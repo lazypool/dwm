@@ -64,9 +64,9 @@ wlan() {
 
 setxkbmap -layout us -variant colemak -option -option caps:swapescape -option lv3:ralt_alt
 fcitx5 &
-cat "$DWM/dunst.conf" "$DWM/themes/$theme/dunstrc" >"$DWM/dunstrc.tmp" # RESET
+cat "$HOME/.config/dunst/dunstrc" "$DWM/themes/$theme/dunstrc" >"$DWM/dunstrc.tmp"
 dunst -conf "$DWM/dunstrc.tmp" >>/dev/null 2>&1 &
-picom --config "$DWM/picom.conf" >>/dev/null 2>&1 & # RESET
+picom --config "$HOME/.config/picom/picom.conf" >>/dev/null 2>&1 &
 xsetroot -name "$(cat "$tmpfile")" # pre-render to avoid initial delay
 updates=$(pkgupdates)
 while true; do

@@ -1,7 +1,10 @@
 #!/bin/bash
 
-source "$DWM/themes/onedark/bar.txt"
-iconpath="$DWM/icons" # RESET
+theme=onedark
+
+# shellcheck source=themes/onedark/bar.txt
+source "$DWM/themes/$theme/bar.txt"
+iconpath="$HOME/.local/share/icons/dwmStatus"
 
 clkupdates() {
 	:
