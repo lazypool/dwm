@@ -4,8 +4,12 @@ theme=onedark
 
 # shellcheck source=themes/onedark/bar.txt
 source "$DWM/themes/$theme/bar.txt"
-tmpfile="$DWM/dwm-statusbar-placeholder.tmp"
-[ ! -f "$tmpfile" ] && touch "$tmpfile"
+mkdir -p "$DWM/.tmp/"
+touch "$DWM/.tmp/dwm-statusbar-placeholder.tmp"
+touch "$DWM/.tmp/pkgupdates.tmp"
+touch "$DWM/.tmp/network.tmp"
+touch "$DWM/.tmp/wifilst.tmp"
+pipe="$DWM/.tmp/pipe.tmp"
 
 battery() {
 	bats='󰠈󰠉󰠊󰠋󰠌󰠍󰠎󰠏󰠐󰠇󰠇󰢜󰂆󰂇󰂈󰢝󰂉󰢞󰂊󰂋󰂅󰂅'
@@ -58,18 +62,23 @@ vol() {
 wlan() {
 	case "$(cat /sys/class/net/wl*/operstate 2>/dev/null)" in
 	up) printf '^b%s^^c%s^  󰖩  ^b%s^^c%s^ Connected ^d^' "$red" "$blk" "$gry" "$wht" ;;
-	down) printf '^b%s^^c%s^  󰖪  ^b%s^^c%s^ Disconnected ^d^' "$red" "$blk" "$gry" "$wht" ;;
+	*) printf '^b%s^^c%s^  󰖪  ^b%s^^c%s^ Disconnected ^d^' "$red" "$blk" "$gry" "$wht" ;;
 	esac
 }
 
 setxkbmap -layout us -variant colemak -option -option caps:swapescape -option lv3:ralt_alt
 fcitx5 &
-cat "$HOME/.config/dunst/dunstrc" "$DWM/themes/$theme/dunstrc" >"$DWM/dunstrc.tmp"
-dunst -conf "$DWM/dunstrc.tmp" >>/dev/null 2>&1 &
+cat "$HOME/.config/dunst/dunstrc" "$DWM/themes/$theme/dunstrc" >"$DWM/.tmp/dunstrc.tmp"
+dunst -conf "$DWM/.tmp/dunstrc.tmp" >>/dev/null 2>&1 &
 picom --config "$HOME/.config/picom/picom.conf" >>/dev/null 2>&1 &
-xsetroot -name "$(cat "$tmpfile")" # pre-render to avoid initial delay
-updates=$(pkgupdates)
-while true; do
-	echo "$updates&$(battery)&$(brightness)&$(cpu)&$(mem)&$(wlan)&$(clock)&$(vol)" >"$tmpfile"
-	xsetroot -name "$(cat "$tmpfile")" && sleep 60
+xsetroot -name "$(cat "$DWM/.tmp/dwm-statusbar-placeholder.tmp")" # pre-render to avoid initial delay
+tick=0; while true; do
+	updates=$(cat "$DWM/.tmp/pkgupdates.tmp")
+	status="$updates&$(battery)&$(brightness)&$(cpu)&$(mem)&$(wlan)&$(clock)&$(vol)"
+	echo "$status" > "$DWM/.tmp/dwm-statusbar-placeholder.tmp"
+	xsetroot -name "$(cat "$DWM/.tmp/dwm-statusbar-placeholder.tmp")"
+	[ "$((tick % 3600))" -eq 0 ] && pkgupdates > "$pipe" && mv "$pipe" "$DWM/.tmp/pkgupdates.tmp"
+	[ "$((tick % 2400))" -eq 0 ] && nmcli --field 'SECURITY,SSID' --terse device wifi list > "$pipe" && mv "$pipe" "$DWM/.tmp/wifilst.tmp"
+	[ "$((tick % 1200))" -eq 0 ] && speedtest-cli --simple > "$pipe" && mv "$pipe" "$DWM/.tmp/network.tmp"
+	sleep 1 && tick=$(((tick + 1) % 3600))
 done
