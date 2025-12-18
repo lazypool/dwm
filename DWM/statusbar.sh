@@ -1,14 +1,37 @@
 #!/bin/bash
 
-theme=onedark
+theme=${DWM_THEME:-"onedark"}
+icons=${DWM_ICONS:-"dwmStatus"}
 
-# shellcheck source=themes/onedark/bar.txt
-source "$DWM/themes/$theme/bar.txt"
-iconpath="$HOME/.local/share/icons/dwmStatus"
+# shellcheck source=themes/onedark/bar.t
+source "$DWM/themes/$theme/bar.t"
+iconpath="$HOME/.local/share/icons/$icons"
 pipe="$DWM/.tmp/pipe.tmp"
+touch "$DWM/.tmp/uridx.tmp"
+uridx=$(($(cat "$DWM/.tmp/uridx.tmp")))
+
+W=$(xdpyinfo | awk '/dimensions:/{print $2}' | cut -d'x' -f1)
+H=$(xdpyinfo | awk '/dimensions:/{print $2}' | cut -d'x' -f2)
+W=$((W - 512)) # fontsize:8
+H=$((H - 256))
+case "$uridx" in
+0) UR=+$((W - W / 5))+$((H / 6)) ;;
+1) UR=+$((W - W / 4))+$((H / 5)) ;;
+2) UR=+$((W - W / 3))+$((H / 4)) ;;
+3) UR=+$((W - W / 2))+$((H / 3)) ;;
+esac
 
 clkupdates() {
-	: # L -> call terminal and run `sudo pacman -Syyu`
+	if [ "$1" == "L" ]; then
+		kill "$(pgrep -f 'st -t statusutil_fetch')"
+		echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
+		st -t statusutil_fetch -c statusutil -f 'monospace:size=8' -g 103x26"$UR" -e "$DWM/fetch.sh" >/dev/null 2>&1 &
+		checkupdates >"$pipe" && mv "$pipe" "$DWM/.tmp/pkgupdates.tmp"
+	elif [ "$1" == "R" ]; then
+		kill "$(pgrep -f 'st -t statusutil_pacman')"
+		echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
+		st -t statusutil_pacman -c statusutil -f 'monospace:size=8' -g 98x30"$UR" -e "$DWM/pacmanf.sh" >/dev/null 2>&1 &
+	fi
 }
 
 clkbattery() {
@@ -58,7 +81,9 @@ clkcpu() {
 			"$(sensors | grep Tctl | awk '{printf "%d°C", $2}') / $(grep -o "^[^ ]*" /proc/loadavg)" \
 			"$(ps axch -o cmd:15,%cpu --sort=-%cpu | head)"
 	elif [ "$1" = "R" ]; then
-		: # call terminal and run btop
+		kill "$(pgrep -f 'st -t statusutil_htop')"
+		echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
+		st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 98x30"$UR" -e htop >>/dev/null 2>&1 &
 	fi
 }
 
@@ -68,7 +93,9 @@ clkmem() {
 			"$(free -h | awk '/^Mem:/{print $3 " / " $2}' | sed 's/i//g')" \
 			"$(ps -eo rss,comm --sort=-rss --no-headers | awk 'NR <= 10 {printf "%-18s %.1f%s\n", substr($2,1,15)(length($2)>15?"...":""), ($1>1e6?$1/1e6:$1/1e3), ($1>1e6?"G":"M")}')"
 	elif [ "$1" = "R" ]; then
-		: # call terminal and run btop
+		kill "$(pgrep -f 'st -t statusutil_htop')"
+		echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
+		st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 98x30"$UR" -e htop >>/dev/null 2>&1 &
 	fi
 }
 
@@ -82,14 +109,17 @@ clkwlan() {
 		else
 			timeout 0 dunstify --app-name=status-toast-wlan --raw-icon="$iconpath/wifi-radar.svg" --action clicked,clk -r 9527 -t 5000 \
 				"$(ip -4 addr show scope global | grep -oP '(?<=inet\s)\d+(\.\d+){3}' | head -1)" \
-				"$(printf "%-10s%s\n" "SSID" "$ssid"; awk -F': ' '{printf "%-10s%s\n", $1, $2}' "$DWM/.tmp/network.tmp")"
+				"$(
+					printf "%-10s%s\n" "SSID" "$ssid"
+					awk -F': ' '{printf "%-10s%s\n", $1, $2}' "$DWM/.tmp/network.tmp"
+				)"
 		fi
 	}
 	notifySucc() {
 		timeout 0 dunstify --app-name=status-toast-wlan --raw-icon="$iconpath/wifi-radar.svg" -r 9527 -t 5000 \
 			"Connection Established" \
 			"You are now connected to the Wi-Fi network <span color='$blu'>$1</span>"
-		speedtest-cli --simple > "$pipe" && mv "$pipe" "$DWM/.tmp/network.tmp"
+		speedtest-cli --simple >"$pipe" && mv "$pipe" "$DWM/.tmp/network.tmp"
 	}
 	notifyFail() {
 		timeout 0 dunstify --app-name=status-toast-wlan --raw-icon="$iconpath/wifi-radar.svg" -r 9527 -t 5000 \
