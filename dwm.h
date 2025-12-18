@@ -20,8 +20,7 @@
 #include "src/drw.h"
 #include "src/util.h"
 
-#define MAXTAGS 8
-#define MINTAGS 5
+#define MAXTAGS 5
 
 #define BUTTONMASK               (ButtonPressMask | ButtonReleaseMask)
 #define CLEANMASK(mask)          (mask & ~(numlockmask | LockMask) & (ShiftMask | ControlMask | Mod1Mask | Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask))
@@ -33,11 +32,10 @@
 #define HEIGHT(X)                ((X)->h + 2 * (X)->bw)
 #define TAGMASK                  ((1 << MAXTAGS) - 1)
 #define TEXTW(X)                 (drw_fontset_getwidth(drw, (X)) + lrpad)
-#define TAG(x)                   ((1 << (x)))
-#define TAGHIDE                  ((TAG(5) | TAG(6) | TAG(7)))
+#define TAG(x)                   ((1 << (MIN(x, MAXTAGS - 1))))
 
 enum { CurNormal, CurResize, CurMove, CurLast };
-enum { SchemeNorm, SchemeSel };
+enum { SchemeNorm, SchemeSel, SchemeTag, SchemeTag1, SchemeTag2, SchemeTag3, SchemeTag4, SchemeTag5, SchemeLayout, SchemeTitle };
 enum { NetSupported, NetWMName, NetWMIcon, NetWMState, NetWMCheck, NetWMFullscreen, NetActiveWindow, NetWMWindowType, NetWMWindowTypeDialog, NetClientList, NetLast };
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast };
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, ClkRootWin, ClkLast };

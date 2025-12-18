@@ -47,6 +47,7 @@ void applyrules(Client *c) {
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m) c->mon = m;
 			unmanaged = r->unmanaged;
+			break;
 		}
 	}
 	if (ch.res_class) XFree(ch.res_class);
@@ -139,7 +140,7 @@ void autostart(void) {
 }
 
 void buttonpress(XEvent *e) {
-	unsigned int i, x, click, occ = 0;
+	unsigned int i, x, click;
 	Arg arg = {0};
 	Client *c;
 	Monitor *m;
@@ -155,9 +156,7 @@ void buttonpress(XEvent *e) {
 
 	if (ev->window == selmon->barwins[0]) {
 		i = x = 0;
-		for (c = m->clients; c; c = c->next) occ |= c->tags == TAGMASK ? 0 : c->tags;
 		do {
-			if (i >= MINTAGS && !(occ & 1 << i || m->tagset[m->seltags] & 1 << i)) continue;
 			x += TEXTW(tags[i]);
 		} while (ev->x >= x && ++i < LENGTH(tags));
 		if (i < LENGTH(tags)) {
@@ -465,21 +464,20 @@ void drawbar(Monitor *m) {
 	}
 
 	for (c = m->clients; c; c = c->next) {
-		occ |= c->tags == TAGMASK ? 0 : c->tags;
+		occ |= c->isglobal || c->tags == TAGMASK ? 0 : c->tags;
 		if (c->isurgent) urg |= c->tags;
 		if (ISVISIBLE(c)) ++n;
 	}
 	x = 0;
 	for (i = 0; i < LENGTH(tags); i++) {
-		if (i >= MINTAGS && !(occ & 1 << i || m->tagset[m->seltags] & 1 << i)) continue;
 		w = TEXTW(tags[i]);
-		drw_setscheme(drw, scheme[occ & 1 << i ? SchemeSel : SchemeNorm]);
+		drw_setscheme(drw, scheme[occ & 1 << i ? schemetags[i] : SchemeTag]);
 		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
 		if (m->tagset[m->seltags] & 1 << i) drw_rect(drw, x + ulpad, bh - ulstroke, w - 2 * ulpad, ulstroke, 1, 0);
 		x += w;
 	}
 	w = TEXTW(m->ltsymbol);
-	drw_setscheme(drw, scheme[SchemeNorm]);
+	drw_setscheme(drw, scheme[SchemeLayout]);
 	x = m->pvx = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 	XMoveResizeWindow(dpy, m->barwins[0], m->wx, m->by, x, bh);
 	drw_map(drw, m->barwins[0], 0, 0, x, bh);
@@ -489,6 +487,7 @@ void drawbar(Monitor *m) {
 		drw_setscheme(drw, scheme[SchemeNorm]);
 		drw_text(drw, x, 0, w, bh, lrpad / 2, "", 0);
 		if (n > 0) {
+			if (m == selmon) drw_setscheme(drw, scheme[SchemeTitle]);
 			for (c = m->clients; c; c = c->next) {
 				if (!ISVISIBLE(c)) continue;
 				if (c->icon) drw_pic(drw, x + s, (bh - c->ich) / 2, c->icw, c->ich, c->icon);
@@ -541,8 +540,10 @@ int drawstatusbar(Monitor *m) {
 		}
 	}
 
-	if (!isc) w += TEXTW(text) - lrpad;
-	else isc = 0;
+	if (!isc)
+		w += TEXTW(text) - lrpad;
+	else
+		isc = 0;
 	text = p;
 	w += 2; /* 1px padding on both sides */
 	ret = x = m->ww - w;
@@ -582,7 +583,7 @@ int drawstatusbar(Monitor *m) {
 			}
 
 			text = text + i + 1;
-			i=-1;
+			i = -1;
 			isc = 0;
 		}
 	}

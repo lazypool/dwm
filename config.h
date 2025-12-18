@@ -2,6 +2,7 @@
 #define CONFIG_H
 // clang-format off
 
+#include "DWM/themes/onedark/wm.h"
 #include "dwm.h"
 
 /* appearance */
@@ -16,15 +17,19 @@ const int ulpad             = 5;  /* horizontal padding between underline and ta
 const int ulstroke          = 3;  /* thickness of the underline */
 const char *fonts[]         = {"Iosevka:style:medium:size=12" ,"JetBrainsMono Nerd Font Mono:style:medium:size=19" };
 const char dmenufont[]      = "JetBrainsMono Nerd Font Mono:size=12";
-const char col_gray1[]      = "#222222";
-const char col_gray2[]      = "#444444";
-const char col_gray3[]      = "#bbbbbb";
-const char col_gray4[]      = "#eeeeee";
-const char col_cyan[]       = "#005577";
+const int schemetags[]      = {SchemeTag1, SchemeTag2, SchemeTag3, SchemeTag4, SchemeTag5};
 const char *colors[][3]     = {
-	/*               fg         bg         border   */
-	[SchemeNorm] = {col_gray3, col_gray1, col_gray2},
-	[SchemeSel]  = {col_gray4, col_cyan,  col_cyan },
+	/*                fg       bg       border   */
+	[SchemeNorm]   = {col_bgy, col_blk, col_gry},
+	[SchemeSel]    = {col_dwh, col_blk, col_bgy},
+	[SchemeTag]    = {col_bgy, col_blk, col_blk},
+	[SchemeTag1]   = {col_blu, col_blk, col_blk},
+	[SchemeTag2]   = {col_red, col_blk, col_blk},
+	[SchemeTag3]   = {col_dyw, col_blk, col_blk},
+	[SchemeTag4]   = {col_grn, col_blk, col_blk},
+	[SchemeTag5]   = {col_ppl, col_blk, col_blk},
+	[SchemeLayout] = {col_grn, col_blk, col_blk},
+	[SchemeTitle]  = {col_ylw, col_blk, col_blk},
 };
 
 /* self-defined scripts */
@@ -32,7 +37,7 @@ const char *autostartscript = "$DWM/autostart.sh";
 const char *statusbarscript = "$DWM/statusbar.sh";
 
 /* tags */
-const char *tags[MAXTAGS] = {"", "", "", "", "", "", "", ""};
+const char *tags[MAXTAGS] = {"", "", "", "", ""};
 
 /* rule */
 const Rule rules[] = {
@@ -40,11 +45,9 @@ const Rule rules[] = {
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
 	 */
-	/* class    instance  title              tagmask  isfloating  isglobal  monitor  unmanaged*/
-	{"Gimp",    NULL,     NULL,              0,       1,          0,        -1,      0},
-	{"Firefox", NULL,     NULL,              1 << 8,  0,          0,        -1,      0},
-	{NULL,      NULL,     "Feishu Meetings", 0,       0,          0,        -1,      1},
-	{NULL,      NULL,     "broken",          0,       0,          0,        -1,      1},
+	/* class       instance  title    tagmask  isfloating  isglobal  monitor  unmanaged*/
+	{"statusutil", NULL,     NULL,    0,       1,          1,        -1,      0},
+	{NULL,         NULL,    "broken", 0,       1,          0,        -1,      1},
 };
 
 /* layout(s) */
@@ -63,7 +66,7 @@ const Layout layouts[] = {
 
 /* commands */
 char dmenumon[2]       = "0"; /* component of dmenucmd, manipulated in spawn() */
-const char *dmenucmd[] = {"dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL};
+const char *dmenucmd[] = {"dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gry, "-nf", col_bgy, "-sb", col_blu, "-sf", col_dwh, NULL};
 const char *termcmd[]  = {"st", NULL};
 
 /* key definitions */
@@ -101,7 +104,7 @@ const Key keys[] = {
 	{MODKEY | ShiftMask, XK_q,      quit,           {0}               },
 	TAGKEYS(XK_1, TAG(0)) TAGKEYS(XK_2, TAG(1)) TAGKEYS(XK_3, TAG(2))
 	TAGKEYS(XK_4, TAG(3)) TAGKEYS(XK_5, TAG(4)) TAGKEYS(XK_6, TAG(5))
-	TAGKEYS(XK_7, TAG(6)) TAGKEYS(XK_8, TAG(7)) TAGKEYS(XK_9, TAGHIDE)
+	TAGKEYS(XK_7, TAG(6)) TAGKEYS(XK_8, TAG(7)) TAGKEYS(XK_9, TAG(9))
 };
 
 /* button definitions */
