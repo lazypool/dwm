@@ -3,7 +3,6 @@
 
 # paths
 PREFIX = /usr/local
-MANPREFIX = ${PREFIX}/share/man
 X11INC = /usr/X11R6/include
 X11LIB = /usr/X11R6/lib
 
@@ -28,7 +27,7 @@ LDFLAGS  = ${LIBS}
 CC = cc
 
 # object file
-SRC = dwm.c src/drw.c src/util.c
+SRC = dwm.c src/drw.c src/util.c src/icon.c
 OBJ = ${SRC:.c=.o}
 
 all: dwm
@@ -44,16 +43,18 @@ dwm: ${OBJ}
 clean:
 	rm -f dwm ${OBJ}
 
-install: all
+deploy:
+	mkdir -p $$HOME/.config/
+	cp -r .config/* $$HOME/.config/
+	mkdir -p $$HOME/.local/share/icons/
+	cp -r icons/* $$HOME/.local/share/icons/
+
+install: all deploy
 	mkdir -p ${DESTDIR}${PREFIX}/bin
 	cp -f dwm ${DESTDIR}${PREFIX}/bin
 	chmod 755 ${DESTDIR}${PREFIX}/bin/dwm
-	mkdir -p ${DESTDIR}${MANPREFIX}/man1
-	sed "s/VERSION/${VERSION}/g" < src/dwm.1 > ${DESTDIR}${MANPREFIX}/man1/dwm.1
-	chmod 644 ${DESTDIR}${MANPREFIX}/man1/dwm.1
 
 uninstall:
-	rm -f ${DESTDIR}${PREFIX}/bin/dwm\
-		${DESTDIR}${MANPREFIX}/man1/dwm.1
+	rm -f ${DESTDIR}${PREFIX}/bin/dwm
 
-.PHONY: all clean install uninstall
+.PHONY: all clean deploy install uninstall
