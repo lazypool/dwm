@@ -23,14 +23,16 @@ esac
 
 clkupdates() {
 	if [ "$1" == "L" ]; then
-		kill "$(pgrep -f 'st -t statusutil_fetch')"
-		echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
-		st -t statusutil_fetch -c statusutil -f 'monospace:size=8' -g 103x26"$UR" -e "$DWM/fetch.sh" >/dev/null 2>&1 &
-		checkupdates >"$pipe" && mv "$pipe" "$DWM/.tmp/pkgupdates.tmp"
+		if ! pgrep -f 'st -t statusutil_fetch'; then
+			echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
+			st -t statusutil_fetch -c statusutil -f 'monospace:size=8' -g 103x26"$UR" -e "$DWM/fetch.sh" >/dev/null 2>&1 &
+			checkupdates >"$pipe" && mv "$pipe" "$DWM/.tmp/pkgupdates.tmp"
+		fi
 	elif [ "$1" == "R" ]; then
-		kill "$(pgrep -f 'st -t statusutil_pacman')"
-		echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
-		st -t statusutil_pacman -c statusutil -f 'monospace:size=8' -g 98x30"$UR" -e "$DWM/pacmanf.sh" >/dev/null 2>&1 &
+		if ! pgrep -f 'st -t statusutil_pacman'; then
+			echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
+			st -t statusutil_pacman -c statusutil -f 'monospace:size=8' -g 98x30"$UR" -e "$DWM/pacmanf.sh" >/dev/null 2>&1 &
+		fi
 	fi
 }
 
@@ -81,9 +83,10 @@ clkcpu() {
 			"$(sensors | grep Tctl | awk '{printf "%d°C", $2}') / $(grep -o "^[^ ]*" /proc/loadavg)" \
 			"$(ps axch -o cmd:15,%cpu --sort=-%cpu | head)"
 	elif [ "$1" = "R" ]; then
-		kill "$(pgrep -f 'st -t statusutil_htop')"
-		echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
-		st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 98x30"$UR" -e htop >>/dev/null 2>&1 &
+		if pgrep -f 'st -t statusutil_htop'; then
+			echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
+			st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 98x30"$UR" -e htop >>/dev/null 2>&1 &
+		fi
 	fi
 }
 
@@ -93,9 +96,10 @@ clkmem() {
 			"$(free -h | awk '/^Mem:/{print $3 " / " $2}' | sed 's/i//g')" \
 			"$(ps -eo rss,comm --sort=-rss --no-headers | awk 'NR <= 10 {printf "%-18s %.1f%s\n", substr($2,1,15)(length($2)>15?"...":""), ($1>1e6?$1/1e6:$1/1e3), ($1>1e6?"G":"M")}')"
 	elif [ "$1" = "R" ]; then
-		kill "$(pgrep -f 'st -t statusutil_htop')"
-		echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
-		st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 98x30"$UR" -e htop >>/dev/null 2>&1 &
+		if pgrep -f 'st -t statusutil_htop'; then
+			echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
+			st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 98x30"$UR" -e htop >>/dev/null 2>&1 &
+		fi
 	fi
 }
 
