@@ -1,35 +1,86 @@
 #!/bin/bash
 
-_thisdir=$(cd $(dirname $0);pwd)
+theme=${DWM_THEME:-"onedark"}
 
-settings() {
-	[ $1 ] && sleep $1
-	xset -b                                      # 关闭蜂鸣器
-	syndaemon -i 1 -t -K -R -d                   # 设置使用键盘时触控板短暂失效
-	$_thisdir/scripts/set_screen.sh two          # 设置显示器 设置键盘映射
-	setxkbmap -layout us -variant colemak -option -option caps:swapescape -option lv3:ralt_alt
+# shellcheck source=themes/onedark/bar.t
+source "$DWM/themes/$theme/bar.t"
+mkdir -p "$DWM/.tmp/"
+touch "$DWM/.tmp/dwm-statusbar-placeholder.tmp"
+touch "$DWM/.tmp/pkgupdates.tmp"
+touch "$DWM/.tmp/network.tmp"
+touch "$DWM/.tmp/wifilst.tmp"
+pipe="$DWM/.tmp/pipe.tmp"
+
+battery() {
+	bats='󰠈󰠉󰠊󰠋󰠌󰠍󰠎󰠏󰠐󰠇󰠇󰢜󰂆󰂇󰂈󰢝󰂉󰢞󰂊󰂋󰂅󰂅'
+	val=$(acpi | sed -n 's/.* \([0-9]\+\)%.*/\1/p' | head -1)
+	icon=${bats:$(("$val" / 10 + $(acpi | grep -q 'Discharging' && echo '0' || echo '11'))):1}
+	printf '^b%s^^c%s^ %s ^d^' "$blk" "$blu" "$icon"
+	printf '^b%s^^c%s^ %s ^d^' "$blk" "$blu" "$val"
 }
 
-daemons() {
-	[ $1 ] && sleep $1
-	$_thisdir/scripts/statusbar.sh cron &        # 开启状态栏定时更新
-	xss-lock -- $_thisdir/scripts/blurlock.sh &  # 开启自动锁屏程序
-	fcitx5 &                                     # 开启输入法
-	flameshot &                                  # 开启截图程序后台板
-	dunst -conf $_thisdir/config/dunst.conf &    # 开启通知弹窗
-	picom --config $_thisdir/config/picom.conf >> /dev/null 2>&1 &
+brightness() {
+	val=$(brightnessctl | sed -n 's/.*(\([0-9]\+\)%).*/\1/p')
+	printf '^b%s^^c%s^  ^d^' "$blk" "$red"
+	printf '^b%s^^c%s^ %.0f ^d^' "$blk" "$red" "$val"
 }
 
-cron() {
-	[ $1 ] && sleep $1
-	let i=10
-	while true; do
-		[ $((i % 10)) -eq 0 ] && $_thisdir/scripts/set_screen.sh check
-		[ $((i % 300)) -eq 0 ] && feh --randomize --bg-fill ~/Pictures/wallpaper/*.png
-		sleep 10; let i+=10                        # 更新壁纸和监视器
-	done
+clock() {
+	printf '^b%s^^c%s^  󰥔  ^d^' "$dbl" "$blk"
+	printf '^b%s^^c%s^ %s ^d^' "$blu" "$blk" "$(date '+%a,  %H:%M  %p') "
 }
 
-settings &                                     # 初始化设置项
-daemons &                                      # 后台程序项
-cron &                                         # 定时任务项
+cpu() {
+	val=$(grep -o "^[^ ]*" /proc/loadavg)
+	printf '^b%s^^c%s^ CPU ^d^' "$grn" "$blk"
+	printf '^b%s^^c%s^ %s ^d^' "$gry" "$wht" "$val"
+}
+
+mem() {
+	val=$(free -h | awk '/^Mem/ { print $3 }' | sed s/i//g)
+	printf '^b%s^^c%s^  ^d^' "$blk" "$blu"
+	printf '^b%s^^c%s^ %s ^d^' "$blk" "$blu" "$val"
+}
+
+pkgupdates() {
+	val=$(cat "$DWM/.tmp/pkgupdates.tmp" | wc -l)
+	if [ "$val" -eq 0 ]; then
+		printf '^b%s^^c%s^   󰬬   Fully Updated   ^d^' "$blk" "$grn"
+	else
+		printf '^b%s^^c%s^   󰬬   %s updates   ^d^' "$blk" "$wht" "$val"
+	fi
+}
+
+vol() {
+	if amixer get Master | grep -q -E '\[off\]|\[0%\]'; then
+		printf '^b%s^^c%s^  󰝟   ^d^' "$blk" "$red"
+	else
+		printf '^b%s^^c%s^  󰕾   ^d^' "$blk" "$grn"
+	fi
+}
+
+wlan() {
+	case "$(cat /sys/class/net/wl*/operstate 2>/dev/null)" in
+	up) printf '^b%s^^c%s^  󰖩  ^b%s^^c%s^ Connected ^d^' "$red" "$blk" "$gry" "$wht" ;;
+	*) printf '^b%s^^c%s^  󰖪  ^b%s^^c%s^ Disconnected ^d^' "$red" "$blk" "$gry" "$wht" ;;
+	esac
+}
+
+xset b off # turn off beeps
+setxkbmap -layout us -variant colemak -option -option caps:swapescape -option lv3:ralt_alt
+syndaemon -i 1 -t -K -R -d # ignore tappad when keys are pressed
+fcitx5 &
+cat "$HOME/.config/dunst/dunstrc" "$DWM/themes/$theme/dunstrc" >"$DWM/.tmp/dunstrc.tmp"
+dunst -conf "$DWM/.tmp/dunstrc.tmp" >>/dev/null 2>&1 &
+picom --config "$HOME/.config/picom/picom.conf" >>/dev/null 2>&1 &
+xsetroot -name "$(cat "$DWM/.tmp/dwm-statusbar-placeholder.tmp")" # pre-render to avoid initial delay
+tick=0
+while true; do
+	status="$(pkgupdates)&$(battery)&$(brightness)&$(cpu)&$(mem)&$(wlan)&$(clock)&$(vol)"
+	echo "$status" >"$DWM/.tmp/dwm-statusbar-placeholder.tmp"
+	xsetroot -name "$(cat "$DWM/.tmp/dwm-statusbar-placeholder.tmp")"
+	[ "$((tick % 3600))" -eq 0 ] && checkupdates >"$pipe" && mv "$pipe" "$DWM/.tmp/pkgupdates.tmp"
+	[ "$((tick % 2400))" -eq 0 ] && nmcli --field 'SECURITY,SSID' --terse device wifi list >"$pipe" && mv "$pipe" "$DWM/.tmp/wifilst.tmp"
+	[ "$((tick % 1200))" -eq 0 ] && speedtest-cli --simple >"$pipe" && mv "$pipe" "$DWM/.tmp/network.tmp"
+	sleep 1 && tick=$(((tick + 1) % 3600))
+done

@@ -20,6 +20,8 @@
 #include "src/drw.h"
 #include "src/util.h"
 
+#define MAXTAGS 5
+
 #define BUTTONMASK               (ButtonPressMask | ButtonReleaseMask)
 #define CLEANMASK(mask)          (mask & ~(numlockmask | LockMask) & (ShiftMask | ControlMask | Mod1Mask | Mod2Mask | Mod3Mask | Mod4Mask | Mod5Mask))
 #define INTERSECT(x, y, w, h, m) (MAX(0, MIN((x) + (w), (m)->wx + (m)->ww) - MAX((x), (m)->wx)) * MAX(0, MIN((y) + (h), (m)->wy + (m)->wh) - MAX((y), (m)->wy)))
@@ -30,10 +32,10 @@
 #define HEIGHT(X)                ((X)->h + 2 * (X)->bw)
 #define TAGMASK                  ((1 << MAXTAGS) - 1)
 #define TEXTW(X)                 (drw_fontset_getwidth(drw, (X)) + lrpad)
-#define MAXTAGS                  (1 << 3)
+#define TAG(x)                   ((1 << (MIN(x, MAXTAGS - 1))))
 
 enum { CurNormal, CurResize, CurMove, CurLast };
-enum { SchemeNorm, SchemeSel };
+enum { SchemeNorm, SchemeSel, SchemeTag, SchemeTag1, SchemeTag2, SchemeTag3, SchemeTag4, SchemeTag5, SchemeLayout, SchemeTitle };
 enum { NetSupported, NetWMName, NetWMIcon, NetWMState, NetWMCheck, NetWMFullscreen, NetActiveWindow, NetWMWindowType, NetWMWindowTypeDialog, NetClientList, NetLast };
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast };
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, ClkRootWin, ClkLast };
@@ -48,88 +50,88 @@ typedef struct Rule Rule;
 typedef struct Pertag Pertag;
 
 struct Arg {
-  int i;
-  unsigned int ui;
-  float f;
-  const void *v;
+	int i;
+	unsigned int ui;
+	float f;
+	const void *v;
 };
 
 struct Button {
-  unsigned int click;
-  unsigned int mask;
-  unsigned int button;
-  void (*func)(const Arg *arg);
-  const Arg arg;
+	unsigned int click;
+	unsigned int mask;
+	unsigned int button;
+	void (*func)(const Arg *arg);
+	const Arg arg;
 };
 
 struct Client {
-  char name[256];
-  float mina, maxa;
-  int x, y, w, h;
-  int oldx, oldy, oldw, oldh;
-  int basew, baseh, incw, inch, maxw, maxh, minw, minh, hintsvalid;
-  int bw, oldbw;
-  unsigned int tags;
-  int isfixed, isfloating, isglobal, isurgent, neverfocus, oldstate, isfullscreen;
-  unsigned int icw, ich;
-  Picture icon;
-  Client *next;
-  Client *snext;
-  Monitor *mon;
-  Window win;
+	char name[256];
+	float mina, maxa;
+	int x, y, w, h;
+	int oldx, oldy, oldw, oldh;
+	int basew, baseh, incw, inch, maxw, maxh, minw, minh, hintsvalid;
+	int bw, oldbw;
+	unsigned int tags;
+	int isfixed, isfloating, isglobal, isurgent, neverfocus, oldstate, isfullscreen;
+	unsigned int icw, ich;
+	Picture icon;
+	Client *next;
+	Client *snext;
+	Monitor *mon;
+	Window win;
 };
 
 struct Key {
-  unsigned int mod;
-  KeySym keysym;
-  void (*func)(const Arg *);
-  const Arg arg;
+	unsigned int mod;
+	KeySym keysym;
+	void (*func)(const Arg *);
+	const Arg arg;
 };
 
 struct Layout {
-  const char *symbol;
-  void (*arrange)(Monitor *);
+	const char *symbol;
+	void (*arrange)(Monitor *);
 };
 
 struct Monitor {
-  char ltsymbol[16];
-  float mfact;
-  int nmaster;
-  int num;
-  int by;             /* bar geometry */
-  int mx, my, mw, mh; /* screen size */
-  int wx, wy, ww, wh; /* window area  */
-  int pvx, pvs;       /* tags & title size */
-  unsigned int seltags;
-  unsigned int sellt;
-  unsigned int tagset[2];
-  int showbar;
-  int topbar;
-  Client *clients;
-  Client *sel;
-  Client *stack;
-  Monitor *next;
-  Window barwins[3];
-  const Layout *lt[2];
-  Pertag *pertag;
+	char ltsymbol[16];
+	float mfact;
+	int nmaster;
+	int num;
+	int by;             /* bar geometry */
+	int mx, my, mw, mh; /* screen size */
+	int wx, wy, ww, wh; /* window area  */
+	int pvx, pvs;       /* tags & title size */
+	unsigned int seltags;
+	unsigned int sellt;
+	unsigned int tagset[2];
+	int showbar;
+	int topbar;
+	Client *clients;
+	Client *sel;
+	Client *stack;
+	Monitor *next;
+	Window barwins[3];
+	const Layout *lt[2];
+	Pertag *pertag;
 };
 
 struct Rule {
-  const char *class;
-  const char *instance;
-  const char *title;
-  unsigned int tags;
-  int isfloating;
-  int isglobal;
-  int monitor;
-  int unmanaged;
+	const char *class;
+	const char *instance;
+	const char *title;
+	unsigned int tags;
+	int isfloating;
+	int isglobal;
+	int monitor;
+	int unmanaged;
 };
 
 struct Pertag {
-  unsigned int curtag;
-  int nmasters[MAXTAGS];
-  unsigned int sellts[MAXTAGS];
-  const Layout *ltidxs[MAXTAGS][2];
+	unsigned int curtag;
+	int nmasters[MAXTAGS];
+	unsigned int sellts[MAXTAGS];
+	const Layout *ltidxs[MAXTAGS][2];
 };
 
 void applyrules(Client *c);
@@ -138,6 +140,7 @@ void arrange(Monitor *m);
 void arrangemon(Monitor *m);
 void attach(Client *c);
 void attachstack(Client *c);
+void autostart(void);
 void buttonpress(XEvent *e);
 void checkotherwm(void);
 void cleanup(void);
@@ -154,6 +157,7 @@ void detachstack(Client *c);
 Monitor *dirtomon(int dir);
 void drawbar(Monitor *m);
 void drawbars(void);
+int drawstatusbar(Monitor *m);
 void enternotify(XEvent *e);
 void expose(XEvent *e);
 void focus(Client *c);
@@ -187,7 +191,6 @@ void resizeclient(Client *c, int x, int y, int w, int h);
 void resizemouse(const Arg *arg);
 void restack(Monitor *m);
 void run(void);
-void runAutostart(void);
 void scan(void);
 int sendevent(Client *c, Atom proto);
 void sendmon(Client *c, Monitor *m);
@@ -233,7 +236,13 @@ int xerrorstart(Display *dpy, XErrorEvent *ee);
 void zoom(const Arg *arg);
 
 const char broken[] = "broken";
-char stext[256];
+char stext[1024];
+char *btnstr[6] = {
+	[Button1] = "L",  /* left mouse button */
+	[Button2] = "M",  /* middle mouse button */
+	[Button3] = "R",  /* right mouse button */
+	[Button4] = "U",  /* mouse wheel up */
+	[Button5] = "D"}; /* mouse wheel down */
 int screen;
 int sw, sh;    /* X display screen geometry width, height */
 int bh;        /* bar height */
@@ -242,20 +251,20 @@ int lrpad;     /* sum of left and right padding for text */
 int (*xerrorxlib)(Display *, XErrorEvent *);
 unsigned int numlockmask = 0;
 void (*handler[LASTEvent])(XEvent *) = {
-    [ButtonPress]      = buttonpress,
-    [ClientMessage]    = clientmessage,
-    [ConfigureRequest] = configurerequest,
-    [ConfigureNotify]  = configurenotify,
-    [DestroyNotify]    = destroynotify,
-    [EnterNotify]      = enternotify,
-    [Expose]           = expose,
-    [FocusIn]          = focusin,
-    [KeyPress]         = keypress,
-    [MappingNotify]    = mappingnotify,
-    [MapRequest]       = maprequest,
-    [MotionNotify]     = motionnotify,
-    [PropertyNotify]   = propertynotify,
-    [UnmapNotify]      = unmapnotify };
+	[ButtonPress]      = buttonpress,
+	[ClientMessage]    = clientmessage,
+	[ConfigureRequest] = configurerequest,
+	[ConfigureNotify]  = configurenotify,
+	[DestroyNotify]    = destroynotify,
+	[EnterNotify]      = enternotify,
+	[Expose]           = expose,
+	[FocusIn]          = focusin,
+	[KeyPress]         = keypress,
+	[MappingNotify]    = mappingnotify,
+	[MapRequest]       = maprequest,
+	[MotionNotify]     = motionnotify,
+	[PropertyNotify]   = propertynotify,
+	[UnmapNotify]      = unmapnotify};
 Atom wmatom[WMLast], netatom[NetLast];
 int running = 1;
 Cur *cursor[CurLast];
