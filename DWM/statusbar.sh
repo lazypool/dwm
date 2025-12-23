@@ -83,7 +83,7 @@ clkcpu() {
 			"$(sensors | grep Tctl | awk '{printf "%d°C", $2}') / $(grep -o "^[^ ]*" /proc/loadavg)" \
 			"$(ps axch -o cmd:15,%cpu --sort=-%cpu | head)"
 	elif [ "$1" = "R" ]; then
-		if pgrep -f 'st -t statusutil_htop'; then
+		if ! pgrep -f 'st -t statusutil_htop'; then
 			echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
 			st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 98x30"$UR" -e htop >>/dev/null 2>&1 &
 		fi
@@ -96,7 +96,7 @@ clkmem() {
 			"$(free -h | awk '/^Mem:/{print $3 " / " $2}' | sed 's/i//g')" \
 			"$(ps -eo rss,comm --sort=-rss --no-headers | awk 'NR <= 10 {printf "%-18s %.1f%s\n", substr($2,1,15)(length($2)>15?"...":""), ($1>1e6?$1/1e6:$1/1e3), ($1>1e6?"G":"M")}')"
 	elif [ "$1" = "R" ]; then
-		if pgrep -f 'st -t statusutil_htop'; then
+		if ! pgrep -f 'st -t statusutil_htop'; then
 			echo $(((uridx + 1) % 4)) >"$DWM/.tmp/uridx.tmp"
 			st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 98x30"$UR" -e htop >>/dev/null 2>&1 &
 		fi
