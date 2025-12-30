@@ -1419,6 +1419,7 @@ void tagmon(const Arg *arg) {
 void tile(Monitor *m) {
 	unsigned int i, n, mw, my, ty;
 	unsigned int cx, cy, cw, ch;
+	unsigned int sp = sidepad;
 	Client *c;
 
 	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
@@ -1429,17 +1430,17 @@ void tile(Monitor *m) {
 		if (i < m->nmaster) {
 			cx = m->wx;
 			cy = m->wy + my;
-			cw = mw;
-			ch = (m->wh - my) / (m->nmaster - i);
+			cw = mw - sp / 2;
+			ch = (m->wh - my + sp) / (m->nmaster - i) - sp;
 			resize(c, cx, cy, cw - (2 * c->bw), ch - (2 * c->bw), 0);
-			if (my + HEIGHT(c) < m->wh) my += HEIGHT(c);
+			if (my + HEIGHT(c) + sp < m->wh) my += HEIGHT(c) + sp;
 		} else {
-			cx = m->wx + mw;
+			cx = m->wx + mw + sp / 2;
 			cy = m->wy + ty;
-			cw = m->ww - mw;
-			ch = (m->wh - ty) / (n - i);
+			cw = m->ww - mw - sp / 2;
+			ch = (m->wh - ty + sp) / (n - i) - sp;
 			resize(c, cx, cy, cw - (2 * c->bw), ch - (2 * c->bw), 0);
-			if (ty + HEIGHT(c) < m->wh) ty += HEIGHT(c);
+			if (ty + HEIGHT(c) + sp < m->wh) ty += HEIGHT(c) + sp;
 		}
 }
 
