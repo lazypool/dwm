@@ -6,7 +6,7 @@
 #include "dwm.h"
 
 /* appearance */
-const unsigned int borderpx = 3;  /* border pixel of windows */
+const unsigned int borderpx = 0;  /* border pixel of windows */
 const unsigned int snap     = 32; /* snap pixel */
 const int showbar           = 1;  /* 0 means no bar */
 const int topbar            = 1;  /* 0 means bottom bar */
@@ -26,7 +26,7 @@ const char *colors[][3]     = {
 	[SchemeTag1]   = {col_blu, col_blk, col_blk},
 	[SchemeTag2]   = {col_red, col_blk, col_blk},
 	[SchemeTag3]   = {col_dyw, col_blk, col_blk},
-	[SchemeTag4]   = {col_grn, col_blk, col_blk},
+	[SchemeTag4]   = {col_cyn, col_blk, col_blk},
 	[SchemeTag5]   = {col_ppl, col_blk, col_blk},
 	[SchemeLayout] = {col_grn, col_blk, col_blk},
 	[SchemeTitle]  = {col_ylw, col_blk, col_blk},
