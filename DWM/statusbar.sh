@@ -14,7 +14,6 @@ UR0=+$((W - 800))+60
 clkupdates() {
 	if [ "$1" == "L" ]; then
 		if ! pgrep -f 'st -t statusutil_fetch'; then
-			kill "$(pgrep -f 'st -t statusutil_pacman')"
 			kill "$(pgrep -f 'st -t statusutil_htop')"
 			st -t statusutil_fetch -c statusutil -f 'monospace:size=8' -g 108x26"$UR0" -e "$DWM/fetch.sh" >/dev/null 2>&1 &
 			checkupdates >"$pipe" && mv "$pipe" "$DWM/.tmp/pkgupdates.tmp"
@@ -77,7 +76,6 @@ clkcpu() {
 	elif [ "$1" = "R" ]; then
 		if ! pgrep -f 'st -t statusutil_htop'; then
 			kill "$(pgrep -f 'st -t statusutil_fetch')"
-			kill "$(pgrep -f 'st -t statusutil_pacman')"
 			st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 108x30"$UR0" -e htop >>/dev/null 2>&1 &
 		fi
 	fi
@@ -91,7 +89,6 @@ clkmem() {
 	elif [ "$1" = "R" ]; then
 		if ! pgrep -f 'st -t statusutil_htop'; then
 			kill "$(pgrep -f 'st -t statusutil_fetch')"
-			kill "$(pgrep -f 'st -t statusutil_pacman')"
 			st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 108x30"$UR0" -e htop >>/dev/null 2>&1 &
 		fi
 	fi
