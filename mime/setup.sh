@@ -33,7 +33,7 @@ Comment=Edit text files in ST terminal with Neovim
 Exec=${HOME}/.local/bin/st-nvim-opener %F
 Terminal=false
 Categories=Utility;TextEditor;
-MimeType=text/plain;text/html;text/css;text/xml;application/json;text/x-python;text/x-shellscript;text/x-c;text/x-c++;text/x-java;text/x-tex;application/javascript;inode/x-empty;
+MimeType=text/plain;text/html;text/css;text/xml;application/json;text/x-script.python;text/x-python;text/x-shellscript;text/x-c;text/x-c++;text/x-java;text/x-tex;application/javascript;inode/x-empty;
 NoDisplay=true
 EOF
 
