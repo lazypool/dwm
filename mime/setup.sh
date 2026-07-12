@@ -64,14 +64,14 @@ NoDisplay=true
 EOF
 
 declare -A mime_map
-mime_map["st-nvim-opener.desktop"]="text/plain text/html text/css text/xml application/json text/x-python text/x-shellscript text/x-c text/x-c++ text/x-java text/x-tex application/javascript inode/x-empty application/x-php text/markdown"
+mime_map["st-nvim-opener.desktop"]="text/plain text/css text/xml application/json text/x-python text/x-shellscript text/x-c text/x-c++ text/x-java text/x-tex application/javascript inode/x-empty application/x-php"
 mime_map["empty-opener.desktop"]="application/x-executable application/x-sharedlib application/x-pie-executable application/octet-stream application/x-msdownload application/x-dosexec"
 mime_map["nsxiv.desktop"]="image/jpeg image/png image/gif image/webp image/tiff image/bmp image/svg+xml image/x-icon"
 mime_map["file-roller.desktop"]="application/zip application/x-rar application/vnd-rar application/x-7z-compressed application/gzip application/x-bzip2 application/x-tar application/x-xz"
-mime_map["wps-office-pdf.desktop"]="application/pdf"
-mime_map["wps-office-wps.desktop"]="application/vnd.openxmlformats-officedocument.wordprocessingml.document application/msword"
-mime_map["wps-office-et.desktop"]="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet application/vnd.ms-excel"
-mime_map["wps-office-wpp.desktop"]="application/vnd.openxmlformats-officedocument.presentationml.presentation application/vnd.ms-powerpoint"
+mime_map["firefox.desktop"]="application/pdf text/markdown text/html"
+mime_map["libreoffice-writer.desktop"]="application/vnd.openxmlformats-officedocument.wordprocessingml.document application/msword"
+mime_map["libreoffice-calc.desktop"]="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet application/vnd.ms-excel"
+mime_map["libreoffice-impress.desktop"]="application/vnd.openxmlformats-officedocument.presentationml.presentation application/vnd.ms-powerpoint"
 mime_map["mpv.desktop"]="audio/mpeg audio/ogg audio/wav audio/flac audio/aac audio/webm video/mp4 video/x-msvideo video/quicktime video/x-matroska video/webm video/ogg"
 
 echo "setting default applications"

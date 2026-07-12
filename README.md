@@ -19,7 +19,7 @@ Part of its design is inspired by [chadwm](https://github.com/siduck/chadwm), an
 One-line command for Arch Linux users:
 
 ```bash
-sudo pacman -S --needed base-devel libx11 libxinerama libxft libxrender fontconfig freetype2 imlib2 xorg-server xorg-xsetroot rofi neovim acpi brightnessctl alsa-utils pacman-contrib lm_sensors networkmanager speedtest-cli xorg-setxkbmap xf86-input-synaptics fcitx5 dunst picom feh unzip unrar p7zip tar gzip bzip2 xz xdg-utils desktop-file-utils fastfetch imagemagick mpv nsxiv htop
+sudo pacman -S --needed base-devel libx11 libxinerama libxft libxrender fontconfig freetype2 imlib2 xorg-server xorg-xsetroot rofi firefox neovim acpi brightnessctl alsa-utils pacman-contrib lm_sensors networkmanager speedtest-cli xorg-setxkbmap xf86-input-synaptics fcitx5 dunst picom feh unzip unrar p7zip tar gzip bzip2 xz xdg-utils desktop-file-utils fastfetch imagemagick mpv nsxiv libreoffice-fresh htop
 ```
 
 <div style="display:flex;gap:4.5em;"><div>
@@ -42,8 +42,9 @@ sudo pacman -S --needed base-devel libx11 libxinerama libxft libxrender fontconf
 
 - rofi
 - st or any other terminal emulator
+- firefox
 - [nvim](https://github.com/lazypool/nvim)
-- wps-office-cn (AUR)
+- libreoffice-fresh
 - fcitx5
 - dunst
 - picom
@@ -93,15 +94,16 @@ rofi needs MIME types to open files. Run [mime/setup.sh](mime/setup.sh) to set d
 
 | File type                          | Opens with                                    |
 |------------------------------------|-----------------------------------------------|
-| .docx .pptx .xlsx .pdf             | wps-office                                    |
+| .docx .pptx .xlsx                  | libreoffice                                   |
+| .pdf .md .html                     | firefox                                       |
 | .jpg .png .gif .bmp .svg           | nsxiv                                         |
 | .mp3 .mp4 .mkv .avi .mov           | mpv                                           |
-| .txt .md .c .h .py .conf .sh       | nvim                                          |
+| .txt .c .h .py .conf .sh           | nvim                                          |
 | .zip .tar .gz .bz2 .xz .7z         | [archive-preview.sh](mime/archive-preview.sh) |
 
 → [what's mime?](https://en.wikipedia.org/wiki/MIME)
 
-> Note for WPS: wps must be set from All-in-One Mode to Multi Component Mode, otherwise it cannot be operated by rofi normally. More details can be found at <https://aur.archlinux.org/packages/wps-office-cn>.
+> Note: Using Firefox to preview markdown files requires the [Markdown Viewer](https://addons.mozilla.org/en-US/firefox/addon/markdown-viewer-webext/) extension.
 
 ## Customization
 

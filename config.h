@@ -49,7 +49,6 @@ const Rule rules[] = {
 	/* t=tags, f=isfloating, g=isglobal, mn=monitor, u=unmanaged */
 	/* class         instance        title           wintype                                     t, f, g, mn, u*/
 	{"statusutil",   NULL,           NULL,           NULL,                                       0, 1, 1, -1, 0},
-	{"wps",          NULL,           NULL,           NULL,                                       0, 1, 0, -1, 0},
 	{NULL,           "st-notebook",  NULL,           NULL,                                       0, 1, 0, -1, 0},
 	{NULL,           "nsxiv",        NULL,           NULL,                                       0, 1, 0, -1, 0},
 	{NULL,           "file-roller",  NULL,           NULL,                                       0, 1, 0, -1, 0},
