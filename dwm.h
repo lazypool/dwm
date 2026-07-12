@@ -36,7 +36,7 @@
 
 enum { CurNormal, CurResize, CurMove, CurLast };
 enum { SchemeNorm, SchemeSel, SchemeTag, SchemeTag1, SchemeTag2, SchemeTag3, SchemeTag4, SchemeTag5, SchemeLayout, SchemeTitle };
-enum { NetSupported, NetWMName, NetWMIcon, NetWMState, NetWMCheck, NetWMFullscreen, NetActiveWindow, NetWMWindowType, NetWMWindowTypeDialog, NetClientList, NetLast };
+enum { NetSupported, NetWMName, NetWMIcon, NetWMState, NetWMCheck, NetWMFullscreen, NetActiveWindow, NetWMWindowType, NetClientList, NetLast };
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast };
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle, ClkClientWin, ClkRootWin, ClkLast };
 
@@ -120,6 +120,7 @@ struct Rule {
 	const char *class;
 	const char *instance;
 	const char *title;
+	const char *wintype;
 	unsigned int tags;
 	int isfloating;
 	int isglobal;
@@ -224,7 +225,6 @@ void updatesizehints(Client *c);
 void updatestatus(void);
 void updatetitle(Client *c);
 void updateicon(Client *c);
-void updatewindowtype(Client *c);
 void updatewmhints(Client *c);
 void view(const Arg *arg);
 void viewontag(const Arg *arg);

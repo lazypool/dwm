@@ -25,6 +25,7 @@
 /* function implementations */
 void applyrules(Client *c) {
 	const char *class, *instance;
+	Atom wintype;
 	unsigned int i;
 	const Rule *r;
 	Monitor *m;
@@ -37,10 +38,12 @@ void applyrules(Client *c) {
 	XGetClassHint(dpy, c->win, &ch);
 	class = ch.res_class ? ch.res_class : broken;
 	instance = ch.res_name ? ch.res_name : broken;
+	wintype = getatomprop(c, netatom[NetWMWindowType]);
 
 	for (i = 0; i < LENGTH(rules); i++) {
 		r = &rules[i];
-		if ((!r->title || strstr(c->name, r->title)) && (!r->class || strstr(class, r->class)) && (!r->instance || strstr(instance, r->instance))) {
+		if ((!r->title || strstr(c->name, r->title)) && (!r->class || strstr(class, r->class)) && (!r->instance || strstr(instance, r->instance)) &&
+				(!r->wintype || wintype == XInternAtom(dpy, r->wintype, False))) {
 			c->isfloating = r->isfloating;
 			c->isglobal = r->isglobal;
 			c->tags |= c->isglobal ? 0 : r->tags;
@@ -893,7 +896,7 @@ void manage(Window w, XWindowAttributes *wa) {
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
 	XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
 	configure(c); /* propagates border_width, if size doesn't change */
-	updatewindowtype(c);
+	if (getatomprop(c, netatom[NetWMState]) == netatom[NetWMFullscreen]) setfullscreen(c, 1);
 	updatesizehints(c);
 	updatewmhints(c);
 	XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask | PropertyChangeMask | StructureNotifyMask);
@@ -1052,7 +1055,6 @@ void propertynotify(XEvent *e) {
 			updateicon(c);
 			if (c == c->mon->sel) drawbar(c->mon);
 		}
-		if (ev->atom == netatom[NetWMWindowType]) updatewindowtype(c);
 	}
 }
 
@@ -1329,7 +1331,6 @@ void setup(void) {
 	netatom[NetWMCheck] = XInternAtom(dpy, "_NET_SUPPORTING_WM_CHECK", False);
 	netatom[NetWMFullscreen] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
 	netatom[NetWMWindowType] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
-	netatom[NetWMWindowTypeDialog] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
 	netatom[NetClientList] = XInternAtom(dpy, "_NET_CLIENT_LIST", False);
 	/* init cursors */
 	cursor[CurNormal] = drw_cur_create(drw, XC_left_ptr);
@@ -1747,14 +1748,6 @@ void updateicon(Client *c) {
 	freeicon(c);
 	c->icon = geticonprop(c->win, &c->icw, &c->ich);
 	if (!c->icon) setdefaulticon(c);
-}
-
-void updatewindowtype(Client *c) {
-	Atom state = getatomprop(c, netatom[NetWMState]);
-	Atom wtype = getatomprop(c, netatom[NetWMWindowType]);
-
-	if (state == netatom[NetWMFullscreen]) setfullscreen(c, 1);
-	if (wtype == netatom[NetWMWindowTypeDialog]) c->isfloating = 1;
 }
 
 void updatewmhints(Client *c) {
