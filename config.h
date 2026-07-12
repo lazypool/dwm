@@ -6,7 +6,7 @@
 #include "dwm.h"
 
 /* appearance */
-const unsigned int borderpx = 3;  /* border pixel of windows */
+const unsigned int borderpx = 0;  /* border pixel of windows */
 const unsigned int snap     = 32; /* snap pixel */
 const int showbar           = 1;  /* 0 means no bar */
 const int topbar            = 1;  /* 0 means bottom bar */
@@ -26,7 +26,7 @@ const char *colors[][3]     = {
 	[SchemeTag1]   = {col_blu, col_blk, col_blk},
 	[SchemeTag2]   = {col_red, col_blk, col_blk},
 	[SchemeTag3]   = {col_dyw, col_blk, col_blk},
-	[SchemeTag4]   = {col_grn, col_blk, col_blk},
+	[SchemeTag4]   = {col_cyn, col_blk, col_blk},
 	[SchemeTag5]   = {col_ppl, col_blk, col_blk},
 	[SchemeLayout] = {col_grn, col_blk, col_blk},
 	[SchemeTitle]  = {col_ylw, col_blk, col_blk},
@@ -44,10 +44,36 @@ const Rule rules[] = {
 	/* xprop(1):
 	 *	WM_CLASS(STRING) = instance, class
 	 *	WM_NAME(STRING) = title
+	 *	_NET_WM_WINDOW_TYPE(ATOM) = wintype
 	 */
-	/* class       instance  title    tagmask  isfloating  isglobal  monitor  unmanaged*/
-	{"statusutil", NULL,     NULL,    0,       1,          1,        -1,      0},
-	{NULL,         NULL,    "broken", 0,       1,          0,        -1,      1},
+	/* t=tags, f=isfloating, g=isglobal, mn=monitor, u=unmanaged */
+	/* class         instance        title           wintype                                     t, f, g, mn, u*/
+	{"statusutil",   NULL,           NULL,           NULL,                                       0, 1, 1, -1, 0},
+	{NULL,           "st-notebook",  NULL,           NULL,                                       0, 1, 0, -1, 0},
+	{NULL,           "nsxiv",        NULL,           NULL,                                       0, 1, 0, -1, 0},
+	{NULL,           "file-roller",  NULL,           NULL,                                       0, 1, 0, -1, 0},
+	{NULL,           "mpv",          NULL,           NULL,                                       0, 1, 0, -1, 0},
+	{NULL,           NULL,           "broken",       NULL,                                       0, 1, 0, -1, 0},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_DIALOG",               0, 0, 0, -1, 1},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_UTILITY",              0, 0, 0, -1, 1},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_TOOLBAR",              0, 0, 0, -1, 1},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_SPLASH",               0, 0, 0, -1, 1},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_DOCK",                 0, 0, 0, -1, 1},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_ALERT",                0, 0, 0, -1, 1},
+	{NULL,           NULL,           NULL,           "_KDE_NET_WM_WINDOW_TYPE_TOPMENU",          0, 0, 0, -1, 1},
+	{NULL,           NULL,           NULL,           "_KDE_NET_WM_WINDOW_TYPE_SPLASHSCREEN",     0, 0, 0, -1, 1},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_DESKTOP",              0, 0, 0, -1, 2},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_MENU",                 0, 0, 0, -1, 3},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_DROPDOWN_MENU",        0, 0, 0, -1, 3},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_POPUP_MENU",           0, 0, 0, -1, 3},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_TOOLTIP",              0, 0, 0, -1, 3},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_NOTIFICATION",         0, 0, 0, -1, 3},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_COMBO",                0, 0, 0, -1, 3},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_DND",                  0, 0, 0, -1, 3},
+	{NULL,           NULL,           NULL,           "_NET_WM_WINDOW_TYPE_OVERRIDE",             0, 0, 0, -1, 3},
+	{NULL,           NULL,           NULL,           "_KDE_NET_WM_WINDOW_TYPE_OVERRIDE",         0, 0, 0, -1, 3},
+	{NULL,           NULL,           NULL,           "_GNOME_WM_WINDOW_TYPE_WORKSPACE_SWITCHER", 0, 0, 0, -1, 3},
+	{NULL,           NULL,           NULL,           "_GNOME_WM_WINDOW_TYPE_TASKLIST_GROUP",     0, 0, 0, -1, 3},
 };
 
 /* layout(s) */

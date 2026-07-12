@@ -9,20 +9,20 @@ iconpath="$HOME/.local/share/icons/$icons"
 pipe="$DWM/.tmp/pipe.tmp"
 
 W=$(xdpyinfo | awk '/dimensions:/{print $2}' | cut -d'x' -f1)
-H=$(xdpyinfo | awk '/dimensions:/{print $2}' | cut -d'x' -f2)
-UR0=+$((W / 2 + W / 16))+$((H / 7))
-UR1=+$((W / 3 + W / 16))+$((H / 2))
-UR2=+$((W / 4 + W / 16))+$((H / 5))
+UR0=+$((W - 800))+60
 
 clkupdates() {
 	if [ "$1" == "L" ]; then
 		if ! pgrep -f 'st -t statusutil_fetch'; then
-			st -t statusutil_fetch -c statusutil -f 'monospace:size=8' -g 103x26"$UR0" -e "$DWM/fetch.sh" >/dev/null 2>&1 &
+			kill "$(pgrep -f 'st -t statusutil_htop')"
+			st -t statusutil_fetch -c statusutil -f 'monospace:size=8' -g 108x26"$UR0" -e "$DWM/fetch.sh" >/dev/null 2>&1 &
 			checkupdates >"$pipe" && mv "$pipe" "$DWM/.tmp/pkgupdates.tmp"
 		fi
 	elif [ "$1" == "R" ]; then
 		if ! pgrep -f 'st -t statusutil_pacman'; then
-			st -t statusutil_pacman -c statusutil -f 'monospace:size=8' -g 98x30"$UR1" -e "$DWM/pacmanf.sh" >/dev/null 2>&1 &
+			kill "$(pgrep -f 'st -t statusutil_fetch')"
+			kill "$(pgrep -f 'st -t statusutil_htop')"
+			st -t statusutil_pacman -c statusutil -f 'monospace:size=8' -g 108x28"$UR0" -e "$DWM/pacmanf.sh" >/dev/null 2>&1 &
 		fi
 	fi
 }
@@ -75,7 +75,8 @@ clkcpu() {
 			"$(ps axch -o cmd:15,%cpu --sort=-%cpu | head)"
 	elif [ "$1" = "R" ]; then
 		if ! pgrep -f 'st -t statusutil_htop'; then
-			st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 98x30"$UR2" -e htop >>/dev/null 2>&1 &
+			kill "$(pgrep -f 'st -t statusutil_fetch')"
+			st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 108x30"$UR0" -e htop >>/dev/null 2>&1 &
 		fi
 	fi
 }
@@ -87,7 +88,8 @@ clkmem() {
 			"$(ps -eo rss,comm --sort=-rss --no-headers | awk 'NR <= 10 {printf "%-18s %.1f%s\n", substr($2,1,15)(length($2)>15?"...":""), ($1>1e6?$1/1e6:$1/1e3), ($1>1e6?"G":"M")}')"
 	elif [ "$1" = "R" ]; then
 		if ! pgrep -f 'st -t statusutil_htop'; then
-			st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 98x30"$UR2" -e htop >>/dev/null 2>&1 &
+			kill "$(pgrep -f 'st -t statusutil_fetch')"
+			st -t statusutil_htop -c statusutil -f 'monospace:size=8' -g 108x30"$UR0" -e htop >>/dev/null 2>&1 &
 		fi
 	fi
 }

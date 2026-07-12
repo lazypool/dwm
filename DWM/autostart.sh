@@ -81,6 +81,6 @@ while true; do
 	xsetroot -name "$(cat "$DWM/.tmp/dwm-statusbar-placeholder.tmp")"
 	[ "$((tick % 3600))" -eq 0 ] && checkupdates >"$pipe" && mv "$pipe" "$DWM/.tmp/pkgupdates.tmp"
 	[ "$((tick % 2400))" -eq 0 ] && nmcli --field 'SECURITY,SSID' --terse device wifi list >"$pipe" && mv "$pipe" "$DWM/.tmp/wifilst.tmp"
-	[ "$((tick % 1200))" -eq 0 ] && speedtest-cli --simple >"$pipe" && mv "$pipe" "$DWM/.tmp/network.tmp"
+	[ "$((tick % 1200))" -eq 0 ] && bash "$DWM"/testwlan.sh >"$pipe" && mv "$pipe" "$DWM/.tmp/network.tmp"
 	sleep 1 && tick=$(((tick + 1) % 3600))
 done

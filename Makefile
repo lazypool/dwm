@@ -3,8 +3,8 @@
 
 # paths
 PREFIX = /usr/local
-X11INC = /usr/X11R6/include
-X11LIB = /usr/X11R6/lib
+X11INC = /usr/include/X11
+X11LIB = /usr/lib/X11
 
 # Xinerama
 XINERAMALIBS  = -lXinerama
@@ -44,12 +44,13 @@ clean:
 	rm -f dwm ${OBJ}
 
 deploy:
-	mkdir -p $$HOME/.config/
-	cp -r .config/* $$HOME/.config/
-	mkdir -p $$HOME/.local/share/icons/
-	cp -r icons/* $$HOME/.local/share/icons/
+	@[ "$$(id -u)" -ne 0 ] || (exit 1)
+	mkdir -p $(HOME)/.config/
+	cp -r .config/* $(HOME)/.config/
+	mkdir -p $(HOME)/.local/share/icons/
+	cp -r icons/* $(HOME)/.local/share/icons/
 
-install: all deploy
+install: all
 	mkdir -p ${DESTDIR}${PREFIX}/bin
 	cp -f dwm ${DESTDIR}${PREFIX}/bin
 	chmod 755 ${DESTDIR}${PREFIX}/bin/dwm
