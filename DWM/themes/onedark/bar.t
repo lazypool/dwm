@@ -1,0 +1,16 @@
+bwh=#fffafa
+wht=#abb2bf
+blk=#1e222a
+gry=#282c34
+red=#d47d85
+drd=#a54242
+ylw=#ecbe7b
+dyw=#ffb347
+grn=#7eca9c
+dgn=#5a935f
+cyn=#56b6c2
+dcy=#008b8b
+blu=#7aa2f7
+dbl=#4a6bc8
+ppl=#c678dd
+dpp=#5e4a8c

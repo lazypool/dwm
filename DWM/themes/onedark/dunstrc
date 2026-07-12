@@ -1,0 +1,49 @@
+
+[status-toast-battery]
+	appname = status-toast-battery
+	background = "#1e222a"
+	frame_color = "#1e222a"
+	foreground = "#7aa2f7"
+	highlight = "#7aa2f7"
+
+[status-toast-brightness]
+	appname = status-toast-brightness
+	background = "#1e222a"
+	frame_color = "#1e222a"
+	foreground = "#d47d85"
+	highlight = "#d47d85"
+
+[status-toast-cpu]
+	appname=status-toast-cpu
+	background = "#1e222a"
+	frame_color = "#1e222a"
+	foreground = "#7eca9c"
+	highlight = "#7eca9c"
+
+[status-toast-mem]
+	appname=status-toast-mem
+	background = "#1e222a"
+	frame_color = "#1e222a"
+	foreground = "#7aa2f7"
+	highlight = "#7aa2f7"
+
+[status-toast-wlan]
+	appname=status-toast-wlan
+	background = "#1e222a"
+	frame_color = "#1e222a"
+	foreground = "#d47d85"
+	highlight = "#d47d85"
+
+[status-toast-calendar]
+	appname=status-toast-calendar
+	background = "#1e222a"
+	frame_color = "#1e222a"
+	foreground = "#7aa2f7"
+	highlight = "#7aa2f7"
+
+[status-toast-volume]
+	appname=status-toast-volume
+	background = "#1e222a"
+	frame_color = "#1e222a"
+	foreground = "#7eca9c"
+	highlight = "#7eca9c"

@@ -1,0 +1,110 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/master/doc/json_schema.json",
+  "logo": {
+		"type": "kitty",
+    "height": 20,
+		"source": "~/.config/fastfetch/logo.png",
+		"padding": {
+			"top": 3,
+			"left": 5
+		}
+  },
+  "display": {
+    "separator": " ➜  "
+  },
+  "modules": [
+		"break",
+		"break",
+		"break",
+    {
+      "type": "os",
+      "key": "OS   ",
+      "keyColor": "31"
+    },
+		{
+			"type": "kernel",
+			"key": " ├ kernel  ",
+			"keyColor": "31"
+		},
+		{
+			"type": "packages",
+			"key": " ├ packages",
+			"format": "{} (pacman)",
+			"keyColor": "31"
+		},
+		{
+			"type": "shell",
+			"key": " └ shell   ",
+			"keyColor": "31"
+		},
+		"break",
+		{
+			"type": "wm",
+			"key": "WM   ",
+			"keyColor": "32"
+		},
+		{
+			"type": "command",
+			"key": " ├ wm theme     ",
+			"format": "{} (dwm theme)",
+			"text": "echo ${DWM_THEME:-onedark}",
+			"keyColor": "32"
+		},
+		{
+			"type": "command",
+			"key": " ├ icons        ",
+			"format": "{}",
+			"text": "echo ${DWM_ICONS:-dwmStatus}",
+			"keyColor": "32"
+		},
+		{
+			"type": "terminal",
+			"key": " ├ terminal     ",
+			"keyColor": "32"
+		},
+		{
+			"type": "terminalfont",
+			"key": " └ terminal font",
+			"keyColor": "32"
+		},
+		"break",
+		{
+			"type": "host",
+			"key": "PC   ",
+			"format": "{5} {1} Type {2}",
+			"keyColor": "33"
+		},
+		{
+			"type": "cpu",
+			"key": " ├ cpu    ",
+			"keyColor": "33"
+		},
+		{
+			"type": "gpu",
+			"key": " ├ gpu    ",
+			"keyColor": "33"
+		},
+		{
+			"type": "memory",
+			"key": " ├ memory ",
+			"keyColor": "33"
+		},
+		{
+			"type": "swap",
+			"key": " ├ swap   ",
+			"keyColor": "33"
+		},
+		{
+			"type": "disk",
+			"key": " ├ disk   ",
+			"keyColor": "33"
+		},
+		{
+			"type": "display",
+			"key": " └ display",
+			"keyColor": "33"
+		},
+    "break",
+		"colors"
+  ]
+}
