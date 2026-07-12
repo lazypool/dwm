@@ -72,7 +72,7 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh, hintsvalid;
 	int bw, oldbw;
 	unsigned int tags;
-	int isfixed, isfloating, isglobal, isurgent, neverfocus, oldstate, isfullscreen;
+	int isfixed, isfloating, isglobal, isurgent, neverfocus, oldstate, isfullscreen, unmanaged;
 	unsigned int icw, ich;
 	Picture icon;
 	Client *next;
@@ -246,7 +246,6 @@ char *btnstr[6] = {
 int screen;
 int sw, sh;    /* X display screen geometry width, height */
 int bh;        /* bar height */
-int unmanaged; /* whether the WM should manage the new window */
 int lrpad;     /* sum of left and right padding for text */
 int (*xerrorxlib)(Display *, XErrorEvent *);
 unsigned int numlockmask = 0;

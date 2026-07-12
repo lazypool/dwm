@@ -49,7 +49,7 @@ void applyrules(Client *c) {
 			c->tags |= c->isglobal ? 0 : r->tags;
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m) c->mon = m;
-			unmanaged = r->unmanaged;
+			c->unmanaged = r->unmanaged;
 			break;
 		}
 	}
@@ -868,9 +868,9 @@ void manage(Window w, XWindowAttributes *wa) {
 		applyrules(c);
 	}
 
-	if (unmanaged) {
+	if (c->unmanaged) {
 		XMapWindow(dpy, c->win);
-		switch (unmanaged) {
+		switch (c->unmanaged) {
 			case 1:
 				XRaiseWindow(dpy, c->win);
 				break;
@@ -881,9 +881,6 @@ void manage(Window w, XWindowAttributes *wa) {
 		updatewmhints(c);
 		if (!c->neverfocus) XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 		sendevent(c, wmatom[WMTakeFocus]);
-		free(c);
-		unmanaged = 0;
-		return;
 	}
 
 	if (c->x + WIDTH(c) > c->mon->wx + c->mon->ww) c->x = c->mon->wx + c->mon->ww - WIDTH(c);
@@ -892,27 +889,29 @@ void manage(Window w, XWindowAttributes *wa) {
 	c->y = MAX(c->y, c->mon->wy);
 	c->bw = borderpx;
 
-	wc.border_width = c->bw;
-	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
-	XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
-	configure(c); /* propagates border_width, if size doesn't change */
-	if (getatomprop(c, netatom[NetWMState]) == netatom[NetWMFullscreen]) setfullscreen(c, 1);
-	updatesizehints(c);
-	updatewmhints(c);
-	XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask | PropertyChangeMask | StructureNotifyMask);
-	grabbuttons(c, 0);
-	if (!c->isfloating) c->isfloating = c->oldstate = trans != None || c->isfixed;
-	if (c->isfloating) XRaiseWindow(dpy, c->win);
-	attach(c);
-	attachstack(c);
-	XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend, (unsigned char *)&(c->win), 1);
-	XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
-	setclientstate(c, NormalState);
-	if (c->mon == selmon) unfocus(selmon->sel, 0);
-	c->mon->sel = c;
-	arrange(c->mon);
-	XMapWindow(dpy, c->win);
-	focus(NULL);
+	if (!c->unmanaged) {
+		wc.border_width = c->bw;
+		XConfigureWindow(dpy, w, CWBorderWidth, &wc);
+		XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
+		configure(c); /* propagates border_width, if size doesn't change */
+		if (getatomprop(c, netatom[NetWMState]) == netatom[NetWMFullscreen]) setfullscreen(c, 1);
+		updatesizehints(c);
+		updatewmhints(c);
+		XSelectInput(dpy, w, EnterWindowMask | FocusChangeMask | PropertyChangeMask | StructureNotifyMask);
+		grabbuttons(c, 0);
+		if (!c->isfloating) c->isfloating = c->oldstate = trans != None || c->isfixed;
+		if (c->isfloating) XRaiseWindow(dpy, c->win);
+		attach(c);
+		attachstack(c);
+		XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend, (unsigned char *)&(c->win), 1);
+		XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
+		setclientstate(c, NormalState);
+		if (c->mon == selmon) unfocus(selmon->sel, 0);
+		c->mon->sel = c;
+		arrange(c->mon);
+		XMapWindow(dpy, c->win);
+		focus(NULL);
+	} else free(c);
 }
 
 void mappingnotify(XEvent *e) {
@@ -1314,7 +1313,6 @@ void setup(void) {
 	drw = drw_create(dpy, screen, root, sw, sh);
 	if (!drw_fontset_create(drw, fonts, LENGTH(fonts))) die("no fonts could be loaded.");
 	lrpad = drw->fonts->h;
-	unmanaged = 0;
 	bh = drw->fonts->h + 12;
 	updategeom();
 	/* init atoms */
