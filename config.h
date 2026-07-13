@@ -16,7 +16,6 @@ const int iconspacing       = 8;  /* space between icon and title */
 const int ulpad             = 5;  /* horizontal padding between underline and tag */
 const int ulstroke          = 3;  /* thickness of the underline */
 const char *fonts[]         = {"Iosevka:style:medium:size=12" ,"JetBrainsMono Nerd Font Mono:style:medium:size=19" };
-const char dmenufont[]      = "JetBrainsMono Nerd Font Mono:size=12";
 const int schemetags[]      = {SchemeTag1, SchemeTag2, SchemeTag3, SchemeTag4, SchemeTag5};
 const char *colors[][3]     = {
 	/*                fg       bg       border   */
@@ -91,8 +90,8 @@ const Layout layouts[] = {
 };
 
 /* commands */
-char dmenumon[2]       = "0"; /* component of dmenucmd, manipulated in spawn() */
-const char *dmenucmd[] = {"dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gry, "-nf", col_bgy, "-sb", col_blu, "-sf", col_dwh, NULL};
+/* rofi: Tab->next item, Shift+Tab->prev item, Ctrl+Tab->next mode, Esc->exit */
+const char *menucmd[] = {"sh", "-c", "~/.config/rofi/scripts/rofi-main.sh", NULL};
 const char *termcmd[]  = {"st", NULL};
 
 /* key definitions */
@@ -105,7 +104,7 @@ const char *termcmd[]  = {"st", NULL};
 
 const Key keys[] = {
 	/* modifier          key        function        argument */
-	{MODKEY,             XK_p,      spawn,          {.v = dmenucmd}   },
+	{MODKEY,             XK_p,      spawn,          {.v = menucmd}    },
 	{MODKEY | ShiftMask, XK_Return, spawn,          {.v = termcmd}    },
 	{MODKEY,             XK_b,      togglebar,      {0}               },
 	{MODKEY,             XK_e,      focusstack,     {.i = +1}         },

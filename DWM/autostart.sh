@@ -72,6 +72,7 @@ syndaemon -i 1 -t -K -R -d # ignore tappad when keys are pressed
 fcitx5 &
 cat "$HOME/.config/dunst/dunstrc" "$DWM/themes/$theme/dunstrc" >"$DWM/.tmp/dunstrc.tmp"
 dunst -conf "$DWM/.tmp/dunstrc.tmp" >>/dev/null 2>&1 &
+cat "$HOME/.config/rofi/config.rasi" "$DWM/themes/$theme/rf.rasi" >"$DWM/.tmp/rofi-config.tmp"
 picom --config "$HOME/.config/picom/picom.conf" >>/dev/null 2>&1 &
 xsetroot -name "$(cat "$DWM/.tmp/dwm-statusbar-placeholder.tmp")" # pre-render to avoid initial delay
 tick=0

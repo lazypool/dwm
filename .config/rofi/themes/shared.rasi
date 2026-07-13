@@ -1,0 +1,22 @@
+// Lazypool's rofi theme configuration
+// https://github.com/lazypool/dwm
+
+* {
+  text-font:                        "JetBrainsMono Nerd Font Mono 12";
+  icon-font:                        "JetBrainsMono Nerd Font Mono 19";
+  center-align:                     0.5;
+  window-padding:                   0% 0%;
+  button-padding:                   14px;
+  entry-padding:                    @button-padding;
+  indicator-padding:                @entry-padding;
+  message-padding:                  @indicator-padding;
+  element-padding:                  @message-padding;
+  element-border:                   0px 4px;
+  element-icon-margin:              0px 6px 0px 0px;
+  border-radius:                    8px;
+}
+
+window {
+  width: 60%;
+  height: 60%;
+}
