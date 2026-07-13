@@ -19,12 +19,18 @@ Part of its design is inspired by [chadwm](https://github.com/siduck/chadwm), an
 One-line command for Arch Linux users:
 
 ```bash
-sudo pacman -S --needed base-devel libx11 libxinerama libxft libxrender fontconfig freetype2 imlib2 xorg-server xorg-xsetroot rofi firefox neovim acpi brightnessctl alsa-utils pacman-contrib lm_sensors networkmanager speedtest-cli xorg-setxkbmap xf86-input-synaptics fcitx5 dunst picom feh unzip unrar p7zip tar gzip bzip2 xz xdg-utils desktop-file-utils fastfetch imagemagick mpv nsxiv libreoffice-fresh htop
+sudo pacman -S --needed base-devel libx11 libxinerama libxft libxrender fontconfig freetype2 imlib2 xorg-server xorg-xsetroot rofi firefox neovim acpi brightnessctl alsa-utils pacman-contrib lm_sensors networkmanager speedtest-cli xorg-setxkbmap xf86-input-synaptics fcitx5 dunst picom feh unzip unrar p7zip tar gzip bzip2 xz xdg-utils desktop-file-utils fastfetch imagemagick mpv nsxiv libreoffice-fresh htop perl-file-mimeinfo
 ```
 
-<div style="display:flex;gap:4.5em;"><div>
+### required packages
 
-### command tool
+<table>
+<tr>
+<th>command tool</th>
+<th>other requirements</th>
+</tr>
+<tr>
+<td valign="top">
 
 - acpi
 - brightnessctl
@@ -34,14 +40,14 @@ sudo pacman -S --needed base-devel libx11 libxinerama libxft libxrender fontconf
 - networkmanager, speedtest-cli
 - imagemagick
 - unzip, unrar, p7zip, tar, gzip, bzip2, xz  
+- perl-file-mimeinfo
 - htop
 
-</div><div>
-
-### other requirements
+</td>
+<td valign="top">
 
 - rofi
-- st or any other terminal emulator
+- st or any other terminal emulator &emsp;&emsp;&emsp;
 - firefox
 - [nvim](https://github.com/lazypool/nvim)
 - libreoffice-fresh
@@ -51,7 +57,9 @@ sudo pacman -S --needed base-devel libx11 libxinerama libxft libxrender fontconf
 - fastfetch
 - feh, mpv, nsxiv
 
-</div></div>
+</td>
+</tr>
+</table>
 
 ### needed fonts
 
@@ -90,7 +98,7 @@ Now you can run `startx` after login to launch dwm.
 
 ### mime setup
 
-rofi needs MIME types to open files. Run [mime/setup.sh](mime/setup.sh) to set defaults:
+**rofi** needs MIME types to open files. Run [mime/setup.sh](mime/setup.sh) to set defaults:
 
 | File type                          | Opens with                                    |
 |------------------------------------|-----------------------------------------------|
@@ -103,14 +111,56 @@ rofi needs MIME types to open files. Run [mime/setup.sh](mime/setup.sh) to set d
 
 → [what's mime?](https://en.wikipedia.org/wiki/MIME)
 
+to make `mime/setup.sh` work, the package [`perl-file-mimeinfo`](https://archlinux.org/packages/extra/any/perl-file-mimeinfo/) is also needed.
+
 > Note: Using Firefox to preview markdown files requires the [Markdown Viewer](https://addons.mozilla.org/en-US/firefox/addon/markdown-viewer-webext/) extension.
 
 ## Customization
 
 ### config.h
 
+#### appearance
+
+#### rules
+
+#### layouts
+
+#### key & button
+
 ### .config/
+
+#### fastfetch
+
+#### picom
+
+#### dunst & rofi
+
+#### mpv
 
 ### themes & icons
 
+#### setup
+
+#### theme creation
+
+#### icon design
+
 ## New Features
+
+## Contributing
+
+Contributions are welcome. Feel free to open an issue or submit a pull request:
+
+1. [fork](https://github.com/lazypool/dwm/fork) and clone the repo
+2. make your changes
+3. submit a pull request
+
+When developing, you may need freetype2 headers for the LSP type checker (e.g. in Neovim):
+
+```bash
+sudo pacman -S freetype2
+sudo ln -s /usr/include/freetype2/ft2build.h /usr/include/
+sudo ln -s /usr/include/freetype2/freetype /usr/include/
+```
+
+LICENSE [MIT/X Consortium License](LICENSE)
