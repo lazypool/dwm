@@ -39,7 +39,7 @@ sudo pacman -S --needed base-devel libx11 libxinerama libxft libxrender fontconf
 - sensors
 - networkmanager, speedtest-cli
 - imagemagick
-- unzip, unrar, p7zip, tar, gzip, bzip2, xz  
+- unzip, unrar, p7zip, tar, gzip, bzip2, xz
 - perl-file-mimeinfo
 - htop
 
@@ -72,7 +72,7 @@ Note: fonts need to be installed separately.
 └── Material-Design-Iconic-Font.ttf
 ```
 
-Download URL [Iosevka & JetBrains](https://github.com/ryanoasis/nerd-fonts/releases) and  [Material-Design-Iconic](https://zavoloklom.dev/material-design-iconic-font/)
+Download URL [Iosevka & JetBrains](https://github.com/ryanoasis/nerd-fonts/releases) and [Material-Design-Iconic](https://zavoloklom.dev/material-design-iconic-font/)
 
 ## Install
 
@@ -100,14 +100,14 @@ Now you can run `startx` after login to launch dwm.
 
 **rofi** needs MIME types to open files. Run [mime/setup.sh](mime/setup.sh) to set defaults:
 
-| File type                          | Opens with                                    |
-|------------------------------------|-----------------------------------------------|
-| .docx .pptx .xlsx                  | libreoffice                                   |
-| .pdf .md .html                     | firefox                                       |
-| .jpg .png .gif .bmp .svg           | nsxiv                                         |
-| .mp3 .mp4 .mkv .avi .mov           | mpv                                           |
-| .txt .c .h .py .conf .sh           | nvim                                          |
-| .zip .tar .gz .bz2 .xz .7z         | [archive-preview.sh](mime/archive-preview.sh) |
+| File type                  | Opens with                                    |
+| -------------------------- | --------------------------------------------- |
+| .docx .pptx .xlsx          | libreoffice                                   |
+| .pdf .md .html             | firefox                                       |
+| .jpg .png .gif .bmp .svg   | nsxiv                                         |
+| .mp3 .mp4 .mkv .avi .mov   | mpv                                           |
+| .txt .c .h .py .conf .sh   | nvim                                          |
+| .zip .tar .gz .bz2 .xz .7z | [archive-preview.sh](mime/archive-preview.sh) |
 
 → [what's mime?](https://en.wikipedia.org/wiki/MIME)
 
@@ -119,13 +119,82 @@ to make `mime/setup.sh` work, the package [`perl-file-mimeinfo`](https://archlin
 
 ### config.h
 
+Modify this file to control how dwm looks and behaves - window borders, bar, fonts, rules, layouts, keybindings and mouse bindings.
+
 #### appearance
+
+| variable                               | description                         |
+| -------------------------------------- | ----------------------------------- |
+| `borderpx`                             | border width of windows             |
+| `snap`                                 | snap threshold in pixels            |
+| `showbar` / `topbar`                   | show bar / bar position             |
+| `sidepad` / `iconsize` / `iconspacing` | padding and title icon size         |
+| `ulpad` / `ulstroke`                   | tag underline offset and thickness  |
+| `fonts[]`                              | font fallback list (with Nerd Font) |
+
+Colors and `schemetags[]` are managed by the theme system, see [themes & icons](#themes--icons).
 
 #### rules
 
+When a new window appears, `applyrules()` walks `rules[]` in order and applies the **first** matching rule.
+
+- Matching fields (substring match, NULL matches any):
+
+| field                | source                                                    |
+| -------------------- | --------------------------------------------------------- |
+| `class` / `instance` | `WM_CLASS` from `xprop`                                   |
+| `title`              | `WM_NAME` / `_NET_WM_NAME`                                |
+| `wintype`            | `_NET_WM_WINDOW_TYPE` (e.g. `_NET_WM_WINDOW_TYPE_DIALOG`) |
+
+- Action fields:
+
+| field        | effect                                                                         |
+| ------------ | ------------------------------------------------------------------------------ |
+| `tags`       | bitmask via `TAG(n)`. 0 means current tag. Ignored if `isglobal` is set.       |
+| `isfloating` | 1 = float, 0 = tile                                                            |
+| `isglobal`   | 1 = visible on all tags                                                        |
+| `monitor`    | assign to monitor by index, `-1` = no assignment, keeps default.               |
+| `unmanaged`  | 1 = raise and exclude from tiling, 2 = lower, 3 = exclude with no stack change |
+
 #### layouts
 
+`layouts[]` defines available arrangements. Each entry has a symbol shown in the bar and an arrange function:
+
+| symbol | layout   | description                            |
+| ------ | -------- | -------------------------------------- |
+| 󰙀      | tile     | master-stack tiling (default)          |
+| 󰗣      | floating | no arrange function, all windows float |
+| 󰎡      | monocle  | fullscreen single window               |
+
+`mfact` controls master area ratio, `nmaster` the number of clients in master area.
+
 #### key & button
+
+First define a command array (NULL-terminated):
+
+```c
+const char *termcmd[] = {"st", NULL};
+const char *menucmd[] = {"sh", "-c", "~/.config/rofi/scripts/rofi-main.sh", NULL};
+```
+
+Bind it to a key with `spawn`:
+
+```c
+{MODKEY,             XK_p,      spawn,          {.v = menucmd}},
+{MODKEY | ShiftMask, XK_Return, spawn,          {.v = termcmd}},
+```
+
+MODKEY is `Mod4Mask` (Super Key). Other modifiers: `ControlMask`, `ShiftMask`, `Mod1Mask..Mod5Mask`.
+
+The same `{.v = ...}` works for buttons:
+
+```c
+{ClkWinTitle,   0,      Button2, zoom,           {0}},
+{ClkClientWin,  MODKEY, Button1, movemouse,      {0}},
+{ClkStatusText, 0,      Button1, clkstatusbar,   {0}},
+```
+
+Click areas: `ClkLtSymbol`, `ClkWinTitle`, `ClkStatusText`, `ClkTagBar`, `ClkClientWin`.
 
 ### .config/
 
