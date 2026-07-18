@@ -198,13 +198,36 @@ Click areas: `ClkLtSymbol`, `ClkWinTitle`, `ClkStatusText`, `ClkTagBar`, `ClkCli
 
 ### .config/
 
-#### fastfetch
+`.config/` is where third-party application config files related to this dwm setup are stored.
+Run `make deploy` to copy them to `~/.config/` so the corresponding apps can pick them up.
 
-#### picom
+```
+.config
+├── dunst
+│   └── dunstrc                # notification daemon
+├── fastfetch
+│   ├── config.jsonc           # system info tool (shows $DWM_THEME, $DWM_ICONS)
+│   └── logo.png               # custom logo
+├── mpv
+│   ├── albumart.jpg           # fallback cover for music mode
+│   ├── mpv.conf               # Vulkan gpu-next, ModernX OSC, thumbfast
+│   ├── script-opts
+│   └── scripts                # modernx.lua, thumbfast.lua, albumart.lua
+├── picom
+│   └── picom.conf             # X11 compositor: rounded corners, blur, animations
+└── rofi
+    ├── config.rasi            # global config
+    ├── scripts                # rofi-main.sh launcher
+    └── themes                 # main.rasi, shared.rasi
+```
 
-#### dunst & rofi
+**related application manuals**
 
-#### mpv
+- [dunst](https://dunst-project.org/) — notification daemon
+- [fastfetch](https://github.com/fastfetch-cli/fastfetch) — system info tool
+- [mpv](https://mpv.io/) — media player
+- [picom](https://github.com/yshui/picom) — X11 compositor
+- [rofi](https://github.com/davatorium/rofi) — app launcher & window switcher
 
 ### themes & icons
 
