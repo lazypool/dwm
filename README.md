@@ -239,6 +239,10 @@ Run `make deploy` to copy them to `~/.config/` so the corresponding apps can pic
 
 ## New Features
 
+### awesome bars
+
+### powermenu
+
 ## Contributing
 
 Contributions are welcome. Feel free to open an issue or submit a pull request:
