@@ -61,3 +61,5 @@ message {
 mode-switcher {
   padding: 0px 1px;
 }
+
+@import "themes/colorschemes.rasi"
