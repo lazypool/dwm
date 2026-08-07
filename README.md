@@ -231,11 +231,80 @@ Run `make deploy` to copy them to `~/.config/` so the corresponding apps can pic
 
 ### themes & icons
 
+This dwm supports custom themes and status-notification icon sets.
+
 #### setup
+
+Set `DWM_THEME` and `DWM_ICONS` in `~/.xinitrc` before starting dwm:
+
+```sh
+export DWM="/path/to/dwm/repo/DWM"
+export DWM_THEME="onedark"   # default: onedark
+export DWM_ICONS="dwmStatus" # default: dwmStatus
+exec dwm 2> "$HOME/.local/dwmerr"
+```
+
+`DWM_THEME` selects `DWM/themes/<theme>/`. `DWM_ICONS` selects `~/.local/share/icons/<icons>/`.
+
+Restart X after changing either variable to make configurations work.
 
 #### theme creation
 
+Create a theme under `DWM/themes/`, following `DWM/themes/onedark/`:
+
+```text
+DWM/themes/mytheme/
+├── bar.t    # status bar colors
+├── dunstrc  # dunst status notification colors
+├── rf.rasi  # rofi colors
+└── wm.h     # dwm colors
+```
+
+**Keep the same filenames and variable names in them.** Then set the theme with:
+
+```sh
+export DWM_THEME="mytheme"
+```
+
+**Note:** For dwm window-bar colors, change the theme include in `config.h` and rebuild:
+
+```c
+#include "DWM/themes/mytheme/wm.h"
+```
+
+```sh
+sudo make clean install
+```
+
 #### icon design
+
+Create an icon set under `icons/`, following `icons/dwmStatus/`:
+
+```text
+icons/myicons/
+├── audio-speaker.svg
+├── battery-empty-charging.svg
+├── battery-empty.svg
+├── battery-full-charging.svg
+├── battery-full.svg
+├── battery-good-charging.svg
+├── battery-good.svg
+├── battery-low-charging.svg
+├── battery-low.svg
+├── brightness.svg
+├── calendar.svg
+├── cpu.svg
+├── dotmemory.svg
+└── wifi-radar.svg
+```
+
+The shell script uses these paths directly. **Keep every filename unchanged.**
+
+Run `make deploy` to copy the set to `~/.local/share/icons/`, then select it via env var:
+
+```sh
+export DWM_ICONS="myicons"
+```
 
 ## New Features
 
