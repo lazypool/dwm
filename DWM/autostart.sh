@@ -6,6 +6,7 @@ theme=${DWM_THEME:-"onedark"}
 source "$DWM/themes/$theme/bar.t"
 mkdir -p "$DWM/.tmp/"
 touch "$DWM/.tmp/dwm-statusbar-placeholder.tmp"
+touch "$DWM/.tmp/hdmi.tmp"
 touch "$DWM/.tmp/pkgupdates.tmp"
 touch "$DWM/.tmp/network.tmp"
 touch "$DWM/.tmp/wifilst.tmp"
@@ -34,6 +35,18 @@ cpu() {
 	val=$(grep -o "^[^ ]*" /proc/loadavg)
 	printf '^b%s^^c%s^ CPU ^d^' "$grn" "$blk"
 	printf '^b%s^^c%s^ %s ^d^' "$gry" "$wht" "$val"
+}
+
+hdmi() {
+	cur=$(xrandr --query | grep -c "^HDMI-A-0 connected")
+	if [ "$cur" -eq 1 ] && [ "$1" -eq 0 ]; then
+		xrandr --output eDP --primary --mode 1920x1080 --pos 0x0 --output HDMI-A-0 --mode 1920x1080 --pos 1920x0
+		notify-send "HDMI Connected" "Extended desktop enabled"
+	elif [ "$cur" -eq 0 ] && [ "$1" -eq 1 ]; then
+		xrandr --output eDP --primary --mode 1920x1080 --pos 0x0 --output HDMI-A-0 --off
+		notify-send "HDMI Disconnected" "Single screen restored"
+	fi
+	printf '%d' "$cur"
 }
 
 mem() {
@@ -80,6 +93,7 @@ while true; do
 	status="$(pkgupdates)&$(battery)&$(brightness)&$(cpu)&$(mem)&$(wlan)&$(clock)&$(vol)"
 	echo "$status" >"$DWM/.tmp/dwm-statusbar-placeholder.tmp"
 	xsetroot -name "$(cat "$DWM/.tmp/dwm-statusbar-placeholder.tmp")"
+	hdmi "$(cat "$DWM/.tmp/hdmi.tmp")" >"$pipe" && mv "$pipe" "$DWM/.tmp/hdmi.tmp"
 	[ "$((tick % 3600))" -eq 0 ] && checkupdates >"$pipe" && mv "$pipe" "$DWM/.tmp/pkgupdates.tmp"
 	[ "$((tick % 2400))" -eq 0 ] && nmcli --field 'SECURITY,SSID' --terse device wifi list >"$pipe" && mv "$pipe" "$DWM/.tmp/wifilst.tmp"
 	[ "$((tick % 1200))" -eq 0 ] && bash "$DWM"/testwlan.sh >"$pipe" && mv "$pipe" "$DWM/.tmp/network.tmp"
