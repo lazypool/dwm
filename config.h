@@ -90,8 +90,7 @@ const Layout layouts[] = {
 };
 
 /* commands */
-/* rofi: Tab->next item, Shift+Tab->prev item, Ctrl+Tab->next mode, Esc->exit */
-const char *menucmd[] = {"sh", "-c", "~/.config/rofi/scripts/rofi-main.sh", NULL};
+const char *panelcmd[] = {"sh", "-c", "~/.config/eww/scripts/panel.sh toggle", NULL};
 const char *termcmd[]  = {"st", NULL};
 
 /* key definitions */
@@ -104,7 +103,7 @@ const char *termcmd[]  = {"st", NULL};
 
 const Key keys[] = {
 	/* modifier          key        function        argument */
-	{MODKEY,             XK_p,      spawn,          {.v = menucmd}    },
+	{MODKEY,             XK_p,      spawn,          {.v = panelcmd}   },
 	{MODKEY | ShiftMask, XK_Return, spawn,          {.v = termcmd}    },
 	{MODKEY,             XK_b,      togglebar,      {0}               },
 	{MODKEY,             XK_e,      focusstack,     {.i = +1}         },

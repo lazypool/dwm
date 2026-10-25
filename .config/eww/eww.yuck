@@ -1,0 +1,98 @@
+;; ===== 中央面板 · eww 配置 =====
+
+;; ---- 数据源（缺失时显示兜底值）----
+(defpoll username :interval "50h" "whoami")
+(defpoll weather-icon :interval "20m" :initial "" "~/.config/eww/scripts/weather.sh icon")
+(defpoll weather-temperature :interval "20m" :initial "--" "~/.config/eww/scripts/weather.sh temperature")
+(defpoll weather-color :interval "20m" :initial "#abb2bf" "~/.config/eww/scripts/weather.sh color")
+(defpoll weather-condition :interval "20m" :initial "Offline" "~/.config/eww/scripts/weather.sh condition")
+(defpoll weather-city :interval "20m" :initial "--" "~/.config/eww/scripts/weather.sh city")
+(defpoll weather-note :interval "20m" :initial "Weather data unavailable." "~/.config/eww/scripts/weather.sh note")
+(defpoll weather-tip :interval "20m" :initial "Check your network connection." "~/.config/eww/scripts/weather.sh tip")
+(defpoll quote :interval "10m" :initial "No quote available." "~/.config/eww/scripts/quote.sh text")
+(defpoll quote-author :interval "10m" :initial "Unknown" "~/.config/eww/scripts/quote.sh author")
+
+;; ---- 组件 ----
+(defwidget profile []
+  (box :class "profile" :orientation "v" :space-evenly "false"
+    (box :orientation "h" :space-evenly "false" :halign "center" (box :class "profile-picture"))
+    (box :orientation "v" :space-evenly "false"
+      (box :class "profile-name" :valign "center" {username})
+      (box :class "profile-subtitle" :halign "center" "A Stylish Catshark"))))
+
+(defwidget weather []
+  (box :class "weather" :orientation "v" :space-evenly "true"
+    (box :orientation "h" :space-evenly "false" :valign "start"
+      (box :class "weather-icon" :style "color: ${weather-color}" {weather-icon})
+      (box :orientation "v" :space-evenly "false" :hexpand "true" :halign "end" :valign "start"
+        (box :class "weather-temperature" :halign "end" "${weather-temperature} °C")
+        (box :class "weather-city" :halign "end" {weather-city})))
+    (box :orientation "v" :space-evenly "false" :hexpand "true"
+      (box :class "weather-condition" {weather-condition})
+      (box :class "weather-note" {weather-note})
+      (box :class "weather-tip" {weather-tip}))))
+
+(defwidget quote []
+  (box :class "quote" :orientation "v" :space-evenly "false"
+    (label :class "quote-text" :halign "start" :text "${quote}" :wrap "true" :width 70)
+    (box :vexpand "true")
+    (label :class "quote-author" :text "- ${quote-author}" :hexpand "true" :xalign 1)))
+
+(defwidget flclash []
+  (box :class "flclash" :orientation "v" :space-evenly "true"
+    (button :class "flclash-button" :onclick "$DWM/eww close-all; ~/.config/eww/scripts/flclash.sh" "󰗹")))
+
+(defwidget background []
+  (box :class "background" :orientation "v" :space-evenly "true"
+    (button :class "background-button" :onclick "$DWM/eww close-all" "")))
+
+(defwidget folder_button [style_class folder]
+  (button :class style_class :onclick "$DWM/eww close-all; ~/.config/eww/scripts/folder.sh ${folder}" folder))
+
+(defwidget folders []
+  (box :class "folders" :orientation "v" :space-evenly "true"
+    (folder_button :style_class "folder-desktop" :folder "Desktop")
+    (folder_button :style_class "folder-documents" :folder "Documents")
+    (folder_button :style_class "folder-downloads" :folder "Downloads")
+    (folder_button :style_class "folder-medias" :folder "Medias")
+    (folder_button :style_class "folder-repos" :folder "Repos")
+    (folder_button :style_class "folder-worktrees" :folder "Worktrees")))
+
+(defwidget search []
+  (box :class "search" :orientation "h" :space-evenly "true"
+    (button :class "search-button" :onclick "$DWM/eww close-all; setsid -f sh -c 'sleep 0.3; exec $HOME/.config/rofi/scripts/rofi-main.sh'" "󰍉")))
+
+(defwidget shutdown []
+  (box :class "shutdown" :orientation "h" :space-evenly "true"
+    (button :class "shutdown-button" :onclick "~/.config/eww/scripts/session.sh open shutdown" "󰐥")))
+
+(defwidget logout []
+  (box :class "logout" :orientation "h" :space-evenly "true"
+    (button :class "logout-button" :onclick "~/.config/eww/scripts/session.sh open logout" "󰍃")))
+
+(defwidget reboot []
+  (box :class "reboot" :orientation "h" :space-evenly "true"
+    (button :class "reboot-button" :onclick "~/.config/eww/scripts/session.sh open reboot" "󰜉")))
+
+(defwidget session_dialog [message action]
+  (box :class "session-dialog" :orientation "v" :space-evenly "false" :valign "center" :halign "center"
+    (label :class "session-dialog-message" :text message)
+    (box :class "session-dialog-buttons" :orientation "h" :spacing 24 :halign "center"
+      (button :class "session-dialog-cancel" :onclick "~/.config/eww/scripts/session.sh close" "Cancel")
+      (button :class "session-dialog-confirm" :onclick action "Confirm"))))
+
+;; ---- 窗口 ----
+(defwindow c_backdrop   :geometry (geometry :x "0px"   :y "0px"   :width "100%"  :height "100%") (box :class "backdrop"))
+(defwindow c_profile    :geometry (geometry :x "381px"  :y "214px" :width "340px" :height "520px") (profile))
+(defwindow c_weather    :geometry (geometry :x "733px"  :y "214px" :width "492px" :height "388px") (weather))
+(defwindow c_flclash    :geometry (geometry :x "733px"  :y "614px" :width "240px" :height "120px") (flclash))
+(defwindow c_background :geometry (geometry :x "985px"  :y "614px" :width "240px" :height "120px") (background))
+(defwindow c_folders    :geometry (geometry :x "1237px" :y "214px" :width "302px" :height "520px") (folders))
+(defwindow c_search     :geometry (geometry :x "381px"  :y "746px" :width "120px" :height "120px") (search))
+(defwindow c_quote      :geometry (geometry :x "513px"  :y "746px" :width "630px" :height "120px") (quote))
+(defwindow c_shutdown   :geometry (geometry :x "1155px" :y "746px" :width "120px" :height "120px") (shutdown))
+(defwindow c_logout     :geometry (geometry :x "1287px" :y "746px" :width "120px" :height "120px") (logout))
+(defwindow c_reboot     :geometry (geometry :x "1419px" :y "746px" :width "120px" :height "120px") (reboot))
+(defwindow c_session_shutdown :geometry (geometry :x "800px" :y "465px" :width "320px" :height "150px") (session_dialog :message "Shut down?" :action "~/.config/eww/scripts/session.sh do shutdown"))
+(defwindow c_session_reboot   :geometry (geometry :x "800px" :y "465px" :width "320px" :height "150px") (session_dialog :message "Reboot?" :action "~/.config/eww/scripts/session.sh do reboot"))
+(defwindow c_session_logout   :geometry (geometry :x "800px" :y "465px" :width "320px" :height "150px") (session_dialog :message "Log out?" :action "~/.config/eww/scripts/session.sh do logout"))

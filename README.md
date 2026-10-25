@@ -115,6 +115,22 @@ to make `mime/setup.sh` work, the package [`perl-file-mimeinfo`](https://archlin
 
 > Note: Using Firefox to preview markdown files requires the [Markdown Viewer](https://addons.mozilla.org/en-US/firefox/addon/markdown-viewer-webext/) extension.
 
+### eww
+
+The central panel uses [eww](https://github.com/elkowar/eww). Build it and place the binary at `$DWM/eww`:
+
+```sh
+git clone https://github.com/elkowar/eww
+cd eww
+cargo build --release --no-default-features --features x11
+cp target/release/eww $DWM/eww
+chmod +x $DWM/eww
+```
+
+Only if `eww` is placed under `$DWM` will the scripts under `.config/eww/scripts` work correctly.
+
+`DWM/autostart.sh` starts the eww daemon at login so the panel will open instantly.
+
 ## Customization
 
 ### config.h
@@ -174,13 +190,13 @@ First define a command array (NULL-terminated):
 
 ```c
 const char *termcmd[] = {"st", NULL};
-const char *menucmd[] = {"sh", "-c", "~/.config/rofi/scripts/rofi-main.sh", NULL};
+const char *panelcmd[] = {"sh", "-c", "~/.config/eww/scripts/panel.sh toggle", NULL};
 ```
 
 Bind it to a key with `spawn`:
 
 ```c
-{MODKEY,             XK_p,      spawn,          {.v = menucmd}},
+{MODKEY,             XK_p,      spawn,          {.v = panelcmd}},
 {MODKEY | ShiftMask, XK_Return, spawn,          {.v = termcmd}},
 ```
 
@@ -205,6 +221,11 @@ Run `make deploy` to copy them to `~/.config/` so the corresponding apps can pic
 .config
 ├── dunst
 │   └── dunstrc                # notification daemon
+├── eww
+│   ├── eww.scss               # widget styles
+│   ├── eww.yuck               # widget layout
+│   ├── scripts                # panel, folders, flclash, power menu, weather, quote
+│   └── theme.scss             # active theme palette
 ├── fastfetch
 │   ├── config.jsonc           # system info tool (shows $DWM_THEME, $DWM_ICONS)
 │   └── logo.png               # custom logo
@@ -224,6 +245,7 @@ Run `make deploy` to copy them to `~/.config/` so the corresponding apps can pic
 **related application manuals**
 
 - [dunst](https://dunst-project.org/) — notification daemon
+- [eww](https://github.com/elkowar/eww) — widget system for the central panel
 - [fastfetch](https://github.com/fastfetch-cli/fastfetch) — system info tool
 - [mpv](https://mpv.io/) — media player
 - [picom](https://github.com/yshui/picom) — X11 compositor
@@ -256,6 +278,7 @@ Create a theme under `DWM/themes/`, following `DWM/themes/onedark/`:
 DWM/themes/mytheme/
 ├── bar.t    # status bar colors
 ├── dunstrc  # dunst status notification colors
+├── eww.scss # eww panel colors
 ├── rf.rasi  # rofi colors
 └── wm.h     # dwm colors
 ```

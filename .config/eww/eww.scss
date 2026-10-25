@@ -1,0 +1,87 @@
+@import "theme.scss";
+
+* { all: unset; }
+
+window {
+  background-color: $blk;
+  color: $wht;
+  font-family: "Noto Sans", sans-serif;
+}
+
+button {
+  all: unset;
+  background-color: $blk;
+  padding: 10px;
+}
+
+window.c_backdrop { background-color: rgba(0, 0, 0, 0.55); }
+
+/* profile */
+.profile-picture {
+  background-image: url("logo.png");
+  background-size: 200px 200px;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 200px;
+  min-width: 200px;
+  border-radius: 500px;
+  margin: 60px 0px 0px 0px;
+}
+.profile-name { margin-top: 60px; color: $red; font-size: 34px; }
+.profile-subtitle { margin-top: 10px; font-size: 22px; }
+
+/* weather */
+.weather { padding: 24px 36px; }
+.weather-icon { font-size: 120px; font-family: "Iosevka Nerd Font"; margin-right: 34px; }
+.weather-temperature { font-size: 46px; font-weight: 900; }
+.weather-city { font-size: 22px; color: $blu; margin-top: 4px; }
+.weather-condition { font-size: 32px; font-weight: bold; color: $red; }
+.weather-note, .weather-tip { font-size: 17px; margin-top: 6px; }
+
+/* quote */
+.quote { padding: 16px 20px; }
+.quote-text { font-size: 16px; color: $wht; }
+.quote-author { font-size: 15px; color: $blu; }
+
+/* flclash */
+.flclash-button, .background-button {
+  padding: 0px;
+  font-size: 80px;
+  font-family: "JetBrainsMono Nerd Font Mono";
+}
+.flclash-button:hover { color: $red; }
+
+/* folders */
+.folders { margin: 10px; }
+.folder-desktop, .folder-documents, .folder-downloads, .folder-medias, .folder-repos, .folder-worktrees {
+  font-size: 22px;
+  font-weight: 600;
+}
+.folder-desktop, .folder-worktrees { color: $blu; }
+.folder-documents, .folder-repos { color: $wht; }
+.folder-downloads, .folder-medias { color: $ppl; }
+.folder-desktop:hover, .folder-documents:hover, .folder-downloads:hover, .folder-medias:hover, .folder-repos:hover, .folder-worktrees:hover {
+  color: $red;
+}
+
+/* action buttons */
+.search-button, .shutdown-button, .logout-button, .reboot-button {
+  font-size: 60px;
+  font-family: "JetBrainsMono Nerd Font Mono";
+  padding: 0px;
+}
+.search-button:hover { color: $red; }
+.shutdown-button { color: $red; }
+.shutdown-button:hover { color: $bwh; }
+.logout-button { color: $grn; }
+.logout-button:hover { color: $red; }
+.reboot-button { color: $blu; }
+.reboot-button:hover { color: $red; }
+
+/* session dialog */
+.session-dialog { background-color: $gry; border-radius: 16px; padding: 26px 34px; min-width: 250px; }
+.session-dialog-message { font-size: 18px; color: $wht; margin-bottom: 20px; }
+.session-dialog-cancel { padding: 10px 28px; border-radius: 10px; font-size: 15px; background-color: $bgy; color: $bwh; }
+.session-dialog-cancel:hover { background-color: $dwh; }
+.session-dialog-confirm { padding: 10px 28px; border-radius: 10px; font-size: 15px; background-color: $red; color: $blk; }
+.session-dialog-confirm:hover { background-color: lighten($red, 5%); }
