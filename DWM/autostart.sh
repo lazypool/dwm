@@ -80,6 +80,7 @@ wlan() {
 }
 
 xset b off # turn off beeps
+xset s off -dpms # don't sleep
 setxkbmap -layout us -variant colemak -option -option caps:swapescape -option lv3:ralt_alt
 syndaemon -i 1 -t -K -R -d # ignore tappad when keys are pressed
 fcitx5 &
