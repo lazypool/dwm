@@ -254,7 +254,12 @@ void clientmessage(XEvent *e) {
 		if (cme->data.l[1] == netatom[NetWMFullscreen] || cme->data.l[2] == netatom[NetWMFullscreen])
 			setfullscreen(c, (cme->data.l[0] == 1 || (cme->data.l[0] == 2 && !c->isfullscreen)));
 	} else if (cme->message_type == netatom[NetActiveWindow]) {
-		if (c != selmon->sel && !c->isurgent) seturgent(c, 1);
+		if (c != selmon->sel) {
+			if (c->mon != selmon) selmon = c->mon;
+			if (!ISVISIBLE(c)) view(&(Arg){.ui = c->tags});
+			focus(c);
+			restack(selmon);
+		}
 	}
 }
 
