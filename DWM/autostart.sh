@@ -88,6 +88,7 @@ cat "$HOME/.config/dunst/dunstrc" "$DWM/themes/$theme/dunstrc" >"$DWM/.tmp/dunst
 dunst -conf "$DWM/.tmp/dunstrc.tmp" >>/dev/null 2>&1 &
 cp "$DWM/themes/$theme/rf.rasi" "$HOME/.config/rofi/themes/colorschemes.rasi"
 cp "$DWM/themes/$theme/eww.scss" "$HOME/.config/eww/theme.scss"
+"$DWM/eww" kill >>/dev/null 2>&1 # drop a daemon left over from a previous session
 "$DWM/eww" daemon >>/dev/null 2>&1 &
 picom --config "$HOME/.config/picom/picom.conf" >>/dev/null 2>&1 &
 xsetroot -name "$(cat "$DWM/.tmp/dwm-statusbar-placeholder.tmp")" # pre-render to avoid initial delay
